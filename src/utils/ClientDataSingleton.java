@@ -2,17 +2,20 @@ package utils;
 
 import utils.tuples.UserTuple;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class ClientDataSingleton {
 
     private static ClientDataSingleton instance;
     private ClientDataSingleton() { }
 
-    public String userName = "";
+    public String userNick = "";
+    public String userID = "";
+    public boolean initialOnlineStatus;
+    public int initialLatitude = 0;
+    public int initialLongitude = 0;
+
+    public int detectionRadius = 10;
+
     private String brokerIP = "";
-    private String lastClickedID = "";
 
     public static ClientDataSingleton getInstance() {
         if (instance == null) {
@@ -21,24 +24,7 @@ public class ClientDataSingleton {
         return instance;
     }
 
-    public void setLastClickedID(String id) {
-        this.lastClickedID = id;
-    }
-
-    public String getLastClickedID() {
-        return this.lastClickedID;
-    }
-
     public void saveUserDataFromTuple(UserTuple user) {
-        this.userName = user.userID;
+        this.userNick = user.userID;
     }
-
-    public void setBrokerIP(String ip) {
-        this.brokerIP = ip;
-    }
-
-    public String getBrokerIP(){
-        return brokerIP;
-    }
-
 }

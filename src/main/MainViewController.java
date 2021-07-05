@@ -2,22 +2,12 @@ package main;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.fxml.FXML;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
-import javafx.stage.Stage;
 import networking.NetworkHandlerSingleton;
 import utils.ClientDataSingleton;
-import utils.exceptions.AcquireTupleException;
-import utils.exceptions.WriteTupleException;
-import utils.tuples.AuctionTrackerTuple;
-import utils.tuples.UserTuple;
 
 public class MainViewController {
 
@@ -44,6 +34,18 @@ public class MainViewController {
     @FXML
     private Text changeDataErrorText;
 
+    @FXML
+    private Text radiusText;
+
+    @FXML
+    private Text latitudeText;
+
+    @FXML
+    private Text longitudeText;
+
+    @FXML
+    private CheckBox isOnlineCheckBox;
+
     private NetworkHandlerSingleton networkHandler;
     private ClientDataSingleton clientData;
 
@@ -59,6 +61,7 @@ public class MainViewController {
         }
         setUpLists();
         setUpErrors();
+        setUpReadings();
     }
 
     private void setUpErrors() {
@@ -75,5 +78,28 @@ public class MainViewController {
         contactsList = FXCollections.observableArrayList();
         contactsListView.setItems(contactsList);
     }
-    
+
+    private void setUpReadings() {
+        setNewRadiusText(clientData.detectionRadius);
+        setNewLatitudeText(clientData.initialLatitude);
+        setNewLongitudeText(clientData.initialLongitude);
+        setOnlineStatusText(clientData.initialOnlineStatus);
+    }
+
+    private void setNewRadiusText(int newRadius) {
+        radiusText.setText("Raio (atual: " + newRadius + ")");
+    }
+
+    private void setNewLatitudeText(int newLatitude) {
+        latitudeText.setText("Latitude (atual: " + newLatitude + ")");
+    }
+
+    private void setNewLongitudeText(int newLongitude) {
+        longitudeText.setText("Longitude (atual: " + newLongitude + ")");
+    }
+
+    private void setOnlineStatusText(boolean isOnline) {
+        isOnlineCheckBox.setText("Online? (atual: " + (isOnline ? "sim" : "não") + ")");
+    }
+
 }

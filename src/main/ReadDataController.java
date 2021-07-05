@@ -9,48 +9,74 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import net.jini.core.transaction.TransactionException;
 import networking.NetworkHandlerSingleton;
+import utils.ClientDataSingleton;
 import utils.exceptions.AcquireTupleException;
 import utils.exceptions.WriteTupleException;
-
-import java.rmi.RemoteException;
 
 public class ReadDataController {
 
     @FXML
-    private TextField userField;
+    private TextField nickField;
+
+    @FXML
+    private TextField userIDField;
+
+    @FXML
+    private TextField radiusField;
+
+    @FXML
+    private TextField latitudeField;
+
+    @FXML
+    private TextField longitudeField;
+
+    @FXML
+    private CheckBox onlineStatusBox;
 
     @FXML
     private Text failedConnectionText;
 
     private NetworkHandlerSingleton networkHandler;
+    private ClientDataSingleton clientData;
 
     @FXML
     public void initialize() {
         failedConnectionText.setOpacity(0);
         networkHandler = NetworkHandlerSingleton.getInstance();
+        clientData = ClientDataSingleton.getInstance();
     }
 
     @FXML
     public void onConfirmButton(ActionEvent event) {
-        String userName = userField.getText().trim();
+        String userName = userIDField.getText().trim();
 
-        if (!loginWithUserName(userName)) return;
-        if (!connectToRoom()) return;
+        // TODO: Add input validation for all of these fields
+        clientData.initialLongitude = Integer.parseInt(longitudeField.getText());
+        clientData.initialLatitude = Integer.parseInt(latitudeField.getText());
+        clientData.detectionRadius = Integer.parseInt(radiusField.getText());
+        clientData.userID = userIDField.getText();
+        clientData.userNick = nickField.getText();
+
+        clientData.initialOnlineStatus = onlineStatusBox.isSelected();
+
+        if (!loginUser()) return;
+        if (!connectToUserSpace()) return;
+
+        networkHandler.addSelfToTracker();
 
         closeSelfWindow(event);
         openMainWindowWithUserName(userName);
     }
 
-    private boolean connectToRoom() {
+    private boolean connectToUserSpace() {
         try {
-            if (!networkHandler.auctionTrackerExists()) {
-                System.out.println("Auction tracker offline. Creating...");
-                networkHandler.writeAuctionTracker();
+            if (!networkHandler.userTrackerExists()) {
+                System.out.println("User tracker offline. Creating...");
+                networkHandler.writeUserTracker();
             }
         } catch (AcquireTupleException e) {
-            failedConnectionText.setText("Couldn't connect to auction space!");
+            failedConnectionText.setText("Couldn't connect to user space!");
             failedConnectionText.setOpacity(1);
             return false;
         } catch (WriteTupleException e) {
@@ -61,9 +87,9 @@ public class ReadDataController {
         return true;
     }
 
-    private boolean loginWithUserName(String userName) {
+    private boolean loginUser() {
         try {
-            networkHandler.loginUser(userName);
+            networkHandler.loginUser();
         } catch (AcquireTupleException e) {
             failedConnectionText.setText("Failed to login/register!");
             failedConnectionText.setOpacity(1);

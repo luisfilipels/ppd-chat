@@ -22,7 +22,7 @@
             </Text>
             <Line endX="122.0" layoutX="115.0" layoutY="47.0" startX="-100.0" stroke="#aeaeae" />
             <ListView fx:id="chatListView" layoutX="15.0" layoutY="64.0" prefHeight="401.0" prefWidth="375.0" />
-            <Text fx:id="mainListErrorText" fill="#fdff52" layoutX="14.0" layoutY="61.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Problema atualizando a lista!" />
+            <Text fx:id="chatViewErrorText" fill="#fdff52" layoutX="14.0" layoutY="61.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Problema atualizando a lista!" />
          </children>
       </Pane>
       <VBox prefHeight="480.0" prefWidth="252.0" HBox.hgrow="ALWAYS">
@@ -43,24 +43,24 @@
                   </Text>
                   <Line endX="78.0" layoutX="116.0" layoutY="293.0" startX="-100.0" stroke="#aeaeae" />
                   <TextField fx:id="contactRadiusField" layoutX="16.0" layoutY="322.0" prefHeight="25.0" prefWidth="367.0" />
-                  <Text fill="WHITE" layoutX="16.0" layoutY="318.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Raio de contatos">
+                  <Text fx:id="radiusText" fill="WHITE" layoutX="16.0" layoutY="318.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Raio">
                      <font>
                         <Font size="13.0" />
                      </font>
                   </Text>
                   <Button fx:id="createAuctionButton" layoutX="14.0" layoutY="441.0" mnemonicParsing="false" onAction="#createAuctionButtonClick" text="Confirmar" />
-                  <Text fill="WHITE" layoutX="16.0" layoutY="370.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Latitude">
+                  <Text fx:id="latitudeText" fill="WHITE" layoutX="16.0" layoutY="370.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Latitude">
                      <font>
                         <Font size="13.0" />
                      </font>
                   </Text>
-                  <Text fx:id="auctionIDErrorText" fill="#fdff52" layoutX="161.0" layoutY="318.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Este campo nao pode estar vazio!" />
-                  <Text fx:id="myListErrorText" fill="#fdff52" layoutX="17.0" layoutY="62.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Problema atualizando a lista!" />
-                  <Text fx:id="auctionCreateErrorText" fill="#fdff52" layoutX="102.0" layoutY="457.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Nao foi possivel alterar dados!" />
+                  <Text fx:id="contactRadiusErrorText" fill="#fdff52" layoutX="161.0" layoutY="318.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Este campo nao pode estar vazio!" />
+                  <Text fx:id="contactListErrorText" fill="#fdff52" layoutX="17.0" layoutY="62.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Problema atualizando a lista!" />
+                  <Text fx:id="changeDataErrorText" fill="#fdff52" layoutX="102.0" layoutY="457.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Nao foi possivel alterar dados!" />
                   <TextField layoutX="17.0" layoutY="373.0" />
                   <TextField layoutX="212.0" layoutY="373.0" />
-                  <Text fill="WHITE" layoutX="212.0" layoutY="370.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Longitude" />
-                  <CheckBox layoutX="17.0" layoutY="410.0" mnemonicParsing="false" text="Online?" textFill="WHITE" />
+                  <Text fx:id="longitudeText" fill="WHITE" layoutX="212.0" layoutY="370.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Longitude" />
+                  <CheckBox fx:id="isOnlineCheckBox" layoutX="17.0" layoutY="410.0" mnemonicParsing="false" text="Online?" textFill="WHITE" />
                </children>
             </Pane>
          </children>
