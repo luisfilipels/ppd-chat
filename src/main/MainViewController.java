@@ -52,6 +52,12 @@ public class MainViewController {
     @FXML
     private CheckBox isOnlineCheckBox;
 
+    @FXML
+    private TextField longitudeField;
+
+    @FXML
+    private TextField latitudeField;
+
     private NetworkHandlerSingleton networkHandler;
     private ClientDataSingleton clientData;
 
@@ -115,6 +121,31 @@ public class MainViewController {
         setNewLatitudeText(clientData.initialLatitude);
         setNewLongitudeText(clientData.initialLongitude);
         setOnlineStatusText(clientData.initialOnlineStatus);
+    }
+
+    @FXML
+    void onConfirmButtonClick() {
+        // TODO: Add input validation
+        // TODO: Make it possible to update just one parameter at a time
+        int radius = Integer.parseInt(contactRadiusField.getText());
+        int longitude = Integer.parseInt(longitudeField.getText());
+        int latitude = Integer.parseInt(latitudeField.getText());
+        boolean isOnline = isOnlineCheckBox.isSelected();
+
+        clientData.detectionRadius = radius;
+
+        try {
+            networkHandler.updateMyUser(latitude, longitude, isOnline);
+        } catch (Exception e) {
+            // TODO: Add UI error messages
+            e.printStackTrace();
+            return;
+        }
+
+        setNewRadiusText(radius);
+        setNewLongitudeText(longitude);
+        setNewLatitudeText(latitude);
+        setOnlineStatusText(isOnline);
     }
 
     private void setNewRadiusText(int newRadius) {

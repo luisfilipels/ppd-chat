@@ -45,4 +45,8 @@ public class NetworkHandlerSingleton {
             return Collections.emptyList();
         }
     }
+
+    public void updateMyUser(int latitude, int longitude, boolean isOnline) throws AcquireTupleException, WriteTupleException {
+        manager.updateUserProperties(latitude, longitude, isOnline);
+    }
 }

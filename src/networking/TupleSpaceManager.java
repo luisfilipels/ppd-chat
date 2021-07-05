@@ -86,6 +86,20 @@ public class TupleSpaceManager {
         }
     }
 
+    public void updateUserProperties(int latitude, int longitude, boolean isOnline) throws AcquireTupleException, WriteTupleException {
+        ClientDataSingleton clientData = ClientDataSingleton.getInstance();
+        UserTuple myUser = takeUser(new UserTuple(clientData.userID), 6000);
+        if (myUser == null) {
+            throw new AcquireTupleException();
+        }
+
+        myUser.latitude = latitude;
+        myUser.longitude = longitude;
+        myUser.isOnline = isOnline;
+
+        writeUser(myUser);
+    }
+
     private void writeUserTracker(UserTrackerTuple tuple) throws WriteTupleException {
         try {
             javaSpace.write(tuple, null, 60 * 60 * 1000);
