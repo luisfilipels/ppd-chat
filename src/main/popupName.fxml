@@ -1,15 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Text?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="190.0" prefWidth="399.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.ReadDataController">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="309.0" prefWidth="399.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.ReadDataController">
    <children>
-      <Button fx:id="confirmButton" layoutX="156.0" layoutY="123.0" mnemonicParsing="false" onAction="#onConfirmButton" prefHeight="44.0" prefWidth="87.0" text="Aceitar" />
-      <Text layoutX="60.0" layoutY="47.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Usuário" />
-      <TextField fx:id="userField" layoutX="60.0" layoutY="50.0" prefHeight="25.0" prefWidth="279.0" />
-      <Text fx:id="failedConnectionText" fill="RED" layoutX="146.0" layoutY="110.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Conexão falhou!" />
+      <Button fx:id="confirmButton" layoutX="157.0" layoutY="239.0" mnemonicParsing="false" onAction="#onConfirmButton" prefHeight="44.0" prefWidth="87.0" text="Aceitar" />
+      <Text layoutX="60.0" layoutY="47.0" strokeType="OUTSIDE" strokeWidth="0.0" text="ID de usuario" />
+      <TextField fx:id="userField" layoutX="60.0" layoutY="50.0" prefHeight="25.0" prefWidth="190.0" />
+      <Text fx:id="failedConnectionText" fill="RED" layoutX="147.0" layoutY="226.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Conexão falhou!" />
+      <Text layoutX="61.0" layoutY="144.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Latitude inicial" />
+      <Text layoutX="218.0" layoutY="143.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Longitude inicial" />
+      <TextField layoutX="62.0" layoutY="148.0" prefHeight="24.0" prefWidth="121.0" />
+      <TextField layoutX="218.0" layoutY="148.0" prefHeight="24.0" prefWidth="121.0" />
+      <TextField layoutX="62.0" layoutY="97.0" prefHeight="24.0" prefWidth="279.0" />
+      <Text layoutX="60.0" layoutY="93.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Raio inicial" />
+      <CheckBox layoutX="64.0" layoutY="185.0" mnemonicParsing="false" text="Iniciar com status online?" />
+      <Button layoutX="264.0" layoutY="51.0" mnemonicParsing="false" text="Aleatorio" />
    </children>
 </Pane>
