@@ -3,6 +3,9 @@ package networking;
 import utils.exceptions.AcquireTupleException;
 import utils.exceptions.WriteTupleException;
 
+import java.util.Collections;
+import java.util.List;
+
 public class NetworkHandlerSingleton {
 
     private static NetworkHandlerSingleton instance;
@@ -35,4 +38,11 @@ public class NetworkHandlerSingleton {
         manager.addSelfToTrackerIfUserExists();
     }
 
+    public List<String> getNeighborhood() {
+        try {
+            return manager.getNeighborhood();
+        } catch (AcquireTupleException e) {
+            return Collections.emptyList();
+        }
+    }
 }

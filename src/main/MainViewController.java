@@ -5,9 +5,14 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.fxml.FXML;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
 import networking.NetworkHandlerSingleton;
 import utils.ClientDataSingleton;
+
+import java.util.HashSet;
+import java.util.List;
 
 public class MainViewController {
 
@@ -18,6 +23,7 @@ public class MainViewController {
     @FXML
     private ListView<HBox> contactsListView;
     private ObservableList<HBox> contactsList;
+    private HashSet<String> contactsAdded;
 
     @FXML
     private TextField contactRadiusField;
@@ -50,6 +56,11 @@ public class MainViewController {
     private ClientDataSingleton clientData;
 
     @FXML
+    void onUpdateContactsClick() {
+        updateContactList();
+    }
+
+    @FXML
     void initialize() {
         clientData = ClientDataSingleton.getInstance();
         try {
@@ -61,14 +72,26 @@ public class MainViewController {
         }
         setUpLists();
         setUpErrors();
+        updateContactList();
         setUpReadings();
     }
 
-    private void setUpErrors() {
-        contactRadiusErrorText.setOpacity(0);
-        chatViewErrorText.setOpacity(0);
-        contactListErrorText.setOpacity(0);
-        changeDataErrorText.setOpacity(0);
+    public void updateContactList() {
+        List<String> contactsToAdd = networkHandler.getNeighborhood();
+
+        for (String userID : contactsToAdd) {
+            if (contactsAdded.contains(userID)) continue;
+            contactsAdded.add(userID);
+
+            HBox hBox = new HBox();
+            Text text = new Text(userID);
+            Region spacer = new Region();
+            CheckBox checkBox = new CheckBox("Send message?");
+            hBox.getChildren().addAll(text, spacer, checkBox);
+            hBox.setHgrow(spacer, Priority.ALWAYS);
+
+            contactsList.add(hBox);
+        }
     }
 
     private void setUpLists() {
@@ -77,6 +100,14 @@ public class MainViewController {
 
         contactsList = FXCollections.observableArrayList();
         contactsListView.setItems(contactsList);
+        contactsAdded = new HashSet<>();
+    }
+
+    private void setUpErrors() {
+        contactRadiusErrorText.setOpacity(0);
+        chatViewErrorText.setOpacity(0);
+        contactListErrorText.setOpacity(0);
+        changeDataErrorText.setOpacity(0);
     }
 
     private void setUpReadings() {

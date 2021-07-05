@@ -2,12 +2,15 @@ package networking;
 
 import net.jini.space.JavaSpace;
 import utils.ClientDataSingleton;
+import utils.MathUtils;
 import utils.exceptions.AcquireTupleException;
 import utils.exceptions.WriteTupleException;
 import utils.tuples.UserTrackerTuple;
 import utils.tuples.UserTuple;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class TupleSpaceManager {
 
@@ -169,5 +172,33 @@ public class TupleSpaceManager {
             e.printStackTrace();
         }
 
+    }
+
+    public List<String> getNeighborhood() throws AcquireTupleException {
+        UserTrackerTuple tracker = readUserTracker(6000);
+
+        ClientDataSingleton clientData = ClientDataSingleton.getInstance();
+        UserTuple myUser = readUser(new UserTuple(clientData.userID), 6000);
+
+        List<String> returnList = new ArrayList<>();
+
+        for (String otherUserID : tracker.userToIPList.keySet()) {
+            if (otherUserID.equals(myUser.userID)) continue;
+
+            UserTuple otherUser = readUser(new UserTuple(otherUserID), 6000);
+
+            if (otherUser == null) {
+                System.out.println("User not found");
+                continue;
+            }
+
+            double distance = MathUtils.getEuclideanDistanceBetweenUsers(myUser, otherUser);
+
+            if (distance <= clientData.detectionRadius) {
+                returnList.add(otherUserID);
+            }
+        }
+
+        return returnList;
     }
 }
