@@ -1,0 +1,54 @@
+Ideias de tuplas:
+
+usuario {
+	String id
+	String senha
+	List<String> lotesCriados
+}
+
+lote {
+	String id
+	String descricao
+	String vendedor
+	Map<String, Pair<Integer, Boolean>> bids // pair: int(value), bool(isPublic)
+}
+
+auctionTracker {
+	HashMap<String, boolean> tracker // Key = auction id, value = is public
+}
+
+
+
+
+flows:
+
+register user:
+1 - check if null -> get usuario with {
+	id: given id
+	senha: given senha
+	lotesCriados: null
+}
+1.1 - if not null -> proceed
+1.2 - if null: check if null -> get usuario with {
+	id: given id
+	senha: null
+	lotesCriados: null
+}
+1.2.1 - if not null -> tell wrong password
+else -> create user with {
+	id: given id
+	senha: given senha
+	lotesCriados: new
+}
+
+
+
+create auction:
+1 - create lote with {
+	id: random ID
+	descricao: given descricao
+	vendedor: given user id
+	bids: new
+}
+
+2 - add random given ID of lote to user's tuple
