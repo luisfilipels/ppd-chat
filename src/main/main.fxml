@@ -48,7 +48,7 @@
                         <Font size="13.0" />
                      </font>
                   </Text>
-                  <Button fx:id="createAuctionButton" layoutX="14.0" layoutY="441.0" mnemonicParsing="false" onAction="#createAuctionButtonClick" text="Confirmar" />
+                  <Button fx:id="createAuctionButton" layoutX="14.0" layoutY="441.0" mnemonicParsing="false" text="Confirmar" />
                   <Text fx:id="latitudeText" fill="WHITE" layoutX="16.0" layoutY="370.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Latitude">
                      <font>
                         <Font size="13.0" />

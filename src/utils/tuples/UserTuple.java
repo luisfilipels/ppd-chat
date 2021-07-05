@@ -27,4 +27,15 @@ public class UserTuple implements Entry {
         this.longitude = longitude;
         this.isOnline = isOnline;
     }
+
+    @Override
+    public String toString() {
+        return "UserTuple{" +
+                "userID='" + userID + '\'' +
+                ", userNick='" + userNick + '\'' +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                ", isOnline=" + isOnline +
+                '}';
+    }
 }

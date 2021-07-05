@@ -31,23 +31,22 @@ public class TupleSpaceManager {
 
         if (userToEnter != null) {
             // User exists
+            System.out.println("User exists. Writing read data to client data");
             userToEnter.userNick = clientData.userNick;
-
-            clientData.initialOnlineStatus = userToEnter.isOnline;
-            clientData.initialLatitude = userToEnter.latitude;
-            clientData.initialLongitude = userToEnter.longitude;
         } else {
             // User does not exist, so create and proceed
+            System.out.println("User does not exist. Writing client data to tuple");
             userToEnter = template;
             userToEnter.userNick = clientData.userNick;
-            userToEnter.userID = clientData.userID;;
+            userToEnter.userID = clientData.userID;
 
             userToEnter.isOnline = clientData.initialOnlineStatus;
             userToEnter.latitude = clientData.initialLatitude;
             userToEnter.longitude = clientData.initialLongitude;
         }
+        System.out.println("User entering: ");
+        System.out.println(userToEnter);
         writeUser(userToEnter);
-        ClientDataSingleton.getInstance().saveUserDataFromTuple(userToEnter);
     }
 
     private void writeUser(UserTuple user) throws WriteTupleException {
@@ -159,6 +158,9 @@ public class TupleSpaceManager {
             tracker.userToIPList.put(myUser.userID, "");
 
             writeUserTracker(tracker);
+            writeUser(myUser);
+
+            System.out.println("Updated user tracker");
 
         } catch (AcquireTupleException e) {
             e.printStackTrace();

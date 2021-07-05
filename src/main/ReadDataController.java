@@ -60,9 +60,12 @@ public class ReadDataController {
 
         clientData.initialOnlineStatus = onlineStatusBox.isSelected();
 
-        if (!loginUser()) return;
-        if (!connectToUserSpace()) return;
+        System.out.println("Got data from input");
 
+        if (!connectToUserSpace()) return;
+        if (!loginUser()) return;
+
+        System.out.println("Adding self to tracker");
         networkHandler.addSelfToTracker();
 
         closeSelfWindow(event);
