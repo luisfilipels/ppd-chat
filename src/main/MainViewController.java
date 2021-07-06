@@ -22,8 +22,8 @@ public class MainViewController {
 
     @FXML
     private ListView<HBox> contactsListView;
-    private ObservableList<HBox> contactsList;
-    private HashSet<String> contactsAdded;
+    private static ObservableList<HBox> contactsList;
+    private static HashSet<String> contactsAdded;
 
     @FXML
     private TextField contactRadiusField;
@@ -82,22 +82,30 @@ public class MainViewController {
         setUpReadings();
     }
 
+    public static void logMessage(String message) {
+        // TODO: Implement this
+    }
+
     public void updateContactList() {
         List<String> contactsToAdd = networkHandler.getNeighborhood();
 
         for (String userID : contactsToAdd) {
-            if (contactsAdded.contains(userID)) continue;
-            contactsAdded.add(userID);
-
-            HBox hBox = new HBox();
-            Text text = new Text(userID);
-            Region spacer = new Region();
-            CheckBox checkBox = new CheckBox("Send message?");
-            hBox.getChildren().addAll(text, spacer, checkBox);
-            hBox.setHgrow(spacer, Priority.ALWAYS);
-
-            contactsList.add(hBox);
+            addContact(userID);
         }
+    }
+
+    public static void addContact(String contact) {
+        if (contactsAdded.contains(contact)) return;
+        contactsAdded.add(contact);
+
+        HBox hBox = new HBox();
+        Text text = new Text(contact);
+        Region spacer = new Region();
+        CheckBox checkBox = new CheckBox("Send message?");
+        hBox.getChildren().addAll(text, spacer, checkBox);
+        hBox.setHgrow(spacer, Priority.ALWAYS);
+
+        contactsList.add(hBox);
     }
 
     private void setUpLists() {

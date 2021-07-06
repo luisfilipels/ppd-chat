@@ -65,11 +65,18 @@ public class ReadDataController {
         if (!connectToUserSpace()) return;
         if (!loginUser()) return;
 
+        networkHandler.startSocket();
+
         System.out.println("Adding self to tracker");
         networkHandler.addSelfToTracker();
 
         closeSelfWindow(event);
         openMainWindowWithUserName(userName);
+    }
+
+    @FXML
+    private void onSendMessage() {
+
     }
 
     private boolean connectToUserSpace() {
