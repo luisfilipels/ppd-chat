@@ -110,7 +110,7 @@ public class NetworkHandlerSingleton {
         return sb.toString();
     }
 
-    public void updateMyUser(int latitude, int longitude, boolean isOnline) throws AcquireTupleException, WriteTupleException {
+    public void updateMyUser(Integer latitude, Integer longitude, Boolean isOnline) throws AcquireTupleException, WriteTupleException {
         manager.updateUserProperties(latitude, longitude, isOnline);
     }
 
@@ -157,6 +157,19 @@ public class NetworkHandlerSingleton {
         } catch (AcquireTupleException | WriteTupleException e) {
             System.out.println("Could not set self to offline!");
             e.printStackTrace();
+        }
+    }
+
+    public boolean userIsInRange(String user) {
+        return manager.userIsInRange(user);
+    }
+
+    public boolean amOnline() {
+        try {
+            return manager.selfIsOnline();
+        } catch (AcquireTupleException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 }

@@ -15,6 +15,9 @@ import utils.ContactEntryHBox;
 import utils.exceptions.AcquireTupleException;
 
 import javax.jms.JMSException;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.HashSet;
 import java.util.List;
 
@@ -90,6 +93,7 @@ public class MainViewController {
             }
         }
         logMessage("(Você): " + message);
+        messageField.clear();
     }
 
     @FXML
@@ -179,33 +183,72 @@ public class MainViewController {
         setNewLatitudeText(clientData.initialLatitude);
         setNewLongitudeText(clientData.initialLongitude);
         setOnlineStatusText(clientData.initialOnlineStatus);
+        isOnlineCheckBox.setSelected(clientData.initialOnlineStatus);
     }
 
     @FXML
-    void onConfirmButtonClick() {
-        // TODO: Add input validation
-        // TODO: Make it possible to update just one parameter at a time
-        int radius = Integer.parseInt(contactRadiusField.getText());
-        int longitude = Integer.parseInt(longitudeField.getText());
-        int latitude = Integer.parseInt(latitudeField.getText());
-        boolean isOnline = isOnlineCheckBox.isSelected();
-
+    void onRadiusAction() {
+        // TODO: Do this for the other fields
+        int radius = -1;
+        try {
+            radius = Integer.parseInt(contactRadiusField.getText());
+            if (radius < 0) {
+                throw new NumberFormatException();
+            }
+        }  catch (NumberFormatException e) {
+            contactRadiusField.setText("Valor inválido!");
+            contactRadiusField.setDisable(true);
+            Timer refreshTimer = new Timer(1000, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    contactRadiusField.setDisable(false);
+                    contactRadiusField.clear();
+                }
+            });
+            refreshTimer.setRepeats(false);
+            refreshTimer.start();
+        }
+        if (radius < 0) return;
         clientData.detectionRadius = radius;
+        updateContactList();
+        setNewRadiusText(radius);
+        getQueuedMessagesIfOnline(networkHandler.amOnline());
+    }
 
+    @FXML
+    void onLatitudeFieldAction() {
+        int latitude = Integer.parseInt(latitudeField.getText());
+        if (!updateMyUser(null, latitude, null)) return;
+        updateContactList();
+        setNewLatitudeText(latitude);
+    }
+
+    @FXML
+    void onLongitudeFieldAction() {
+        int longitude = Integer.parseInt(longitudeField.getText());
+        if (!updateMyUser(longitude, null, null)) return;
+        updateContactList();
+        setNewLongitudeText(longitude);
+    }
+
+    @FXML
+    void onOnlineStatusChanged() {
+        boolean isOnline = isOnlineCheckBox.isSelected();
+        if (!updateMyUser(null, null, isOnline)) return;
+        updateContactList();
+        setOnlineStatusText(isOnline);
+    }
+
+    private boolean updateMyUser(Integer longitude, Integer latitude, Boolean isOnline) {
         try {
             networkHandler.updateMyUser(latitude, longitude, isOnline);
+            getQueuedMessagesIfOnline(isOnlineCheckBox.isSelected());
         } catch (Exception e) {
             // TODO: Add UI error messages
             e.printStackTrace();
-            return;
+            return false;
         }
-
-        updateContactList();
-
-        setNewRadiusText(radius);
-        setNewLongitudeText(longitude);
-        setNewLatitudeText(latitude);
-        setOnlineStatusText(isOnline);
+        return true;
     }
 
     private void setNewRadiusText(int newRadius) {
@@ -222,6 +265,9 @@ public class MainViewController {
 
     private void setOnlineStatusText(boolean isOnline) {
         isOnlineCheckBox.setText("Online? (atual: " + (isOnline ? "sim" : "não") + ")");
+    }
+
+    private void getQueuedMessagesIfOnline(boolean isOnline) {
         if (isOnline) {
             try {
                 List<String> list = networkHandler.getConsumerMessages();

@@ -91,16 +91,16 @@ public class TupleSpaceManager {
         }
     }
 
-    public void updateUserProperties(int latitude, int longitude, boolean isOnline) throws AcquireTupleException, WriteTupleException {
+    public void updateUserProperties(Integer latitude, Integer longitude, Boolean isOnline) throws AcquireTupleException, WriteTupleException {
         ClientDataSingleton clientData = ClientDataSingleton.getInstance();
         UserTuple myUser = takeUser(new UserTuple(clientData.userID), 6000);
         if (myUser == null) {
             throw new AcquireTupleException();
         }
 
-        myUser.latitude = latitude;
-        myUser.longitude = longitude;
-        myUser.isOnline = isOnline;
+        if (latitude != null) myUser.latitude = latitude;
+        if (longitude != null) myUser.longitude = longitude;
+        if (isOnline != null) myUser.isOnline = isOnline;
 
         writeUser(myUser);
     }
@@ -249,5 +249,24 @@ public class TupleSpaceManager {
         myUser.isOnline = false;
 
         writeUser(myUser);
+    }
+
+    public boolean userIsInRange(String user) {
+        try {
+            ClientDataSingleton clientData = ClientDataSingleton.getInstance();
+            UserTuple myUser = readUser(new UserTuple(clientData.userID), 6000);
+            UserTuple otherUser = readUser(new UserTuple(user), 6000);
+            if (otherUser == null) throw new AcquireTupleException();
+
+            return MathUtils.getEuclideanDistanceBetweenUsers(myUser, otherUser) <= clientData.detectionRadius;
+        } catch (AcquireTupleException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean selfIsOnline() throws AcquireTupleException {
+        UserTuple myUser = readUser(new UserTuple(ClientDataSingleton.getInstance().userID), 6000);
+        return myUser.isOnline;
     }
 }

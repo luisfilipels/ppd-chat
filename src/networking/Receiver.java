@@ -28,11 +28,12 @@ public class Receiver implements Runnable{
     }
 
     void handlePing(String author) {
-        // TODO: Check lecture for unequal radius conditions
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                MainViewController.addContact(author);
+                if (NetworkHandlerSingleton.getInstance().userIsInRange(author)) {
+                    MainViewController.addContact(author);
+                }
             }
         });
     }
