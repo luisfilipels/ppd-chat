@@ -1,6 +1,7 @@
 package main;
 
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -9,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import networking.NetworkHandlerSingleton;
 import utils.ClientDataSingleton;
 import utils.exceptions.AcquireTupleException;
@@ -141,6 +143,13 @@ public class ReadDataController {
             primaryStage.setScene(new Scene(root, 800, 500));
             primaryStage.setResizable(false);
             primaryStage.show();
+            primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                @Override
+                public void handle(WindowEvent windowEvent) {
+                    networkHandler.setMyselfToOffline();
+                    System.exit(0);
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }

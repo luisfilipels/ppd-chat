@@ -241,4 +241,13 @@ public class TupleSpaceManager {
 
         return userTracker.userToIPList.get(userID);
     }
+
+    public void setMyselfToOffline() throws AcquireTupleException, WriteTupleException {
+        ClientDataSingleton clientData = ClientDataSingleton.getInstance();
+        UserTuple myUser = takeUser(new UserTuple(clientData.userID), 6000);
+
+        myUser.isOnline = false;
+
+        writeUser(myUser);
+    }
 }

@@ -150,4 +150,13 @@ public class NetworkHandlerSingleton {
         ClientDataSingleton clientData = ClientDataSingleton.getInstance();
         sendPingMessage(contact, clientData.userID);
     }
+
+    public void setMyselfToOffline() {
+        try {
+            manager.setMyselfToOffline();
+        } catch (AcquireTupleException | WriteTupleException e) {
+            System.out.println("Could not set self to offline!");
+            e.printStackTrace();
+        }
+    }
 }
