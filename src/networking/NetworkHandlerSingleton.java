@@ -4,11 +4,13 @@ import utils.ClientDataSingleton;
 import utils.exceptions.AcquireTupleException;
 import utils.exceptions.WriteTupleException;
 
+import javax.jms.JMSException;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -19,6 +21,8 @@ public class NetworkHandlerSingleton {
     private Sender sender;
     private Receiver receiver;
     private DatagramSocket socket;
+    private Producer producer;
+    private Consumer consumer;
 
     private Thread t1;
     private Thread t2;
@@ -54,9 +58,9 @@ public class NetworkHandlerSingleton {
         manager.addSelfToTrackerIfUserExists(getMyIP());
     }
 
-    public void sendChatMessage(String to, String message) throws AcquireTupleException {
+    public void sendChatMessage(String to, String message) throws AcquireTupleException, JMSException, IllegalAccessException {
         if (!manager.userIsReachable(to)) {
-            // TODO: Do asynchronous communication here
+            producer.produceMessage(to, "chat|" + ClientDataSingleton.getInstance().userID + "|" + message);
             return;
         }
 
@@ -120,6 +124,22 @@ public class NetworkHandlerSingleton {
 
         t1.start();
         t2.start();
+    }
+
+    public void startProducerAndConsumer() throws JMSException {
+        producer = new Producer();
+        consumer = new Consumer();
+
+        producer.startProducer();
+        consumer.startConsumer();
+    }
+
+    public List<String> getConsumerMessages() throws JMSException, IllegalAccessException {
+        List<String> returnList = new ArrayList<>();
+        while (consumer.hasMessages()) {
+            returnList.add(consumer.consumeMessage());
+        }
+        return returnList;
     }
 
     public void pingUser(String contact) throws AcquireTupleException {

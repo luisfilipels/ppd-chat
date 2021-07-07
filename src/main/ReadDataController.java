@@ -14,6 +14,7 @@ import utils.ClientDataSingleton;
 import utils.exceptions.AcquireTupleException;
 import utils.exceptions.WriteTupleException;
 
+import javax.jms.JMSException;
 import java.net.SocketException;
 
 public class ReadDataController {
@@ -81,13 +82,15 @@ public class ReadDataController {
         System.out.println("Adding self to tracker");
         networkHandler.addSelfToTracker();
 
+        try {
+            networkHandler.startProducerAndConsumer();
+        } catch (JMSException e) {
+            System.out.println("Couldn't initialize async message code!");
+            e.printStackTrace();
+        }
+
         closeSelfWindow(event);
         openMainWindowWithUserName(userName);
-    }
-
-    @FXML
-    private void onSendMessage() {
-
     }
 
     private boolean connectToUserSpace() {

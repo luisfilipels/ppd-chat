@@ -14,6 +14,7 @@ import utils.ClientDataSingleton;
 import utils.ContactEntryHBox;
 import utils.exceptions.AcquireTupleException;
 
+import javax.jms.JMSException;
 import java.util.HashSet;
 import java.util.List;
 
@@ -83,7 +84,7 @@ public class MainViewController {
             if (!contact.selectedCheckbox.isSelected() && countSelected > 0) continue;
             try {
                 networkHandler.sendChatMessage(contact.userID, message);
-            } catch (AcquireTupleException e) {
+            } catch (AcquireTupleException | JMSException | IllegalAccessException e) {
                 System.out.println("Couldn't send message to " + contact + "!");
                 e.printStackTrace();
             }
@@ -221,6 +222,18 @@ public class MainViewController {
 
     private void setOnlineStatusText(boolean isOnline) {
         isOnlineCheckBox.setText("Online? (atual: " + (isOnline ? "sim" : "não") + ")");
+        if (isOnline) {
+            try {
+                List<String> list = networkHandler.getConsumerMessages();
+                for (String s : list) {
+                    String[] messageParts = s.split("\\|");
+                    logMessage(messageParts[1] + ": " + messageParts[2]);
+                }
+            } catch (JMSException | IllegalAccessException | NullPointerException e) {
+                System.out.println("Couldn't get queue messages!");
+                e.printStackTrace();
+            }
+        }
     }
 
 }
