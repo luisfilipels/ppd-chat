@@ -55,6 +55,11 @@ public class NetworkHandlerSingleton {
     }
 
     public void sendMessageTo(String user, String message) throws AcquireTupleException {
+        if (!manager.userIsReachable(user)) {
+            // TODO: Do asynchronous communication here
+            return;
+        }
+
         String userAddress = manager.getUserIP(user);
 
         String ip = userAddress.split("\\|")[0];

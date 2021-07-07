@@ -157,6 +157,21 @@ public class TupleSpaceManager {
         writeUserTracker(auctionTracker);
     }
 
+    public boolean userIsReachable(String userID) {
+        try {
+            ClientDataSingleton clientData = ClientDataSingleton.getInstance();
+            UserTuple myUser = readUser(new UserTuple(clientData.userID), 6000);
+            UserTuple otherUser = readUser(new UserTuple(userID), 6000);
+            if (otherUser == null) throw new AcquireTupleException();
+
+            return MathUtils.getEuclideanDistanceBetweenUsers(myUser, otherUser) <= clientData.detectionRadius
+                    && otherUser.isOnline;
+        } catch (AcquireTupleException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public void addSelfToTrackerIfUserExists(String myIP) {
         ClientDataSingleton clientData = ClientDataSingleton.getInstance();
 
