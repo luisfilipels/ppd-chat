@@ -2,14 +2,16 @@ package main;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.scene.control.*;
 import javafx.fxml.FXML;
-import javafx.scene.layout.HBox;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
 import networking.NetworkHandlerSingleton;
 import utils.ClientDataSingleton;
+import utils.ContactEntryHBox;
 import utils.exceptions.AcquireTupleException;
 
 import java.util.HashSet;
@@ -22,8 +24,8 @@ public class MainViewController {
     private static ObservableList<String> chatList;
 
     @FXML
-    private ListView<HBox> contactsListView;
-    private static ObservableList<HBox> contactsList;
+    private ListView<ContactEntryHBox> contactsListView;
+    private static ObservableList<ContactEntryHBox> contactsList;
     private static HashSet<String> contactsAdded;
 
     @FXML
@@ -75,7 +77,7 @@ public class MainViewController {
         String message = messageField.getText();
         for (String contact : contactsAdded) {
             try {
-                networkHandler.sendMessageTo(contact, message);
+                networkHandler.sendChatMessage(contact, message);
             } catch (AcquireTupleException e) {
                 System.out.println("Couldn't send message to " + contact + "!");
                 e.printStackTrace();
@@ -100,7 +102,6 @@ public class MainViewController {
     }
 
     public static void logMessage(String message) {
-        // TODO: Implement this
         chatList.add(message);
     }
 
@@ -113,14 +114,38 @@ public class MainViewController {
     }
 
     public static void addContact(String contact) {
-        if (contactsAdded.contains(contact)) return;
+        ClientDataSingleton clientData = ClientDataSingleton.getInstance();
+        if (contactsAdded.contains(contact) || contact.equals(clientData.userID)) return;
+
+        try {
+            System.out.println("Pinging user " + contact);
+            NetworkHandlerSingleton.getInstance().pingUser(contact);
+        } catch (AcquireTupleException e) {
+            System.out.println("Couldn't ping user " + contact + "!");
+            e.printStackTrace();
+        }
+
         contactsAdded.add(contact);
 
-        HBox hBox = new HBox();
+        ContactEntryHBox hBox = new ContactEntryHBox(contact);
         Text text = new Text(contact);
         Region spacer = new Region();
         CheckBox checkBox = new CheckBox("Send message?");
-        hBox.getChildren().addAll(text, spacer, checkBox);
+        Button deleteButton = new Button("Excluir");
+
+        deleteButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                contactsAdded.remove(contact);
+                ContactEntryHBox boxToBeRemoved = null;
+                for (ContactEntryHBox hbox : contactsList) {
+                    if (hbox.userID.equals(contact)) boxToBeRemoved = hbox;
+                }
+                contactsList.remove(boxToBeRemoved);
+            }
+        });
+
+        hBox.getChildren().addAll(text, spacer, checkBox, deleteButton);
         hBox.setHgrow(spacer, Priority.ALWAYS);
 
         contactsList.add(hBox);
@@ -167,6 +192,8 @@ public class MainViewController {
             e.printStackTrace();
             return;
         }
+
+        updateContactList();
 
         setNewRadiusText(radius);
         setNewLongitudeText(longitude);

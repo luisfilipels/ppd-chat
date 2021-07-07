@@ -38,17 +38,20 @@ public class TupleSpaceManager {
             // User exists
             System.out.println("User exists. Writing read data to client data");
             userToEnter.userNick = clientData.userNick;
+
+
         } else {
             // User does not exist, so create and proceed
             System.out.println("User does not exist. Writing client data to tuple");
             userToEnter = template;
             userToEnter.userNick = clientData.userNick;
             userToEnter.userID = clientData.userID;
-
-            userToEnter.isOnline = clientData.initialOnlineStatus;
-            userToEnter.latitude = clientData.initialLatitude;
-            userToEnter.longitude = clientData.initialLongitude;
         }
+
+        userToEnter.isOnline = clientData.initialOnlineStatus;
+        userToEnter.latitude = clientData.initialLatitude;
+        userToEnter.longitude = clientData.initialLongitude;
+
         System.out.println("User entering: ");
         System.out.println(userToEnter);
         writeUser(userToEnter);
@@ -213,7 +216,8 @@ public class TupleSpaceManager {
         List<String> returnList = new ArrayList<>();
 
         for (String otherUserID : tracker.userToIPList.keySet()) {
-            if (otherUserID.equals(myUser.userID)) continue;
+            if (otherUserID.trim().equals(myUser.userID.trim())) continue;
+            System.out.println("other user: " + otherUserID + "   my user: " + myUser.userID);
 
             UserTuple otherUser = readUser(new UserTuple(otherUserID), 6000);
 

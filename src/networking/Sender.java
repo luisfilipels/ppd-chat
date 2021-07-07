@@ -25,8 +25,8 @@ public class Sender implements Runnable{
     private String address;
     private int port;
 
-    public void setStringToSend(String string, String address, int port) {
-        this.stringToSend = string;
+    public void setStringToSend(String message, String address, int port) {
+        this.stringToSend = message;
         this.address = address;
         this.port = port;
         s.release();
@@ -44,15 +44,13 @@ public class Sender implements Runnable{
     @Override
     public void run() {
         try {
-
             while (true) {
                 waitForData();
 
                 InetAddress remote = InetAddress.getByName(address);
                 System.out.println("Sending data to address " + address);
 
-                String message = "chat|" + ClientDataSingleton.getInstance().userID + "|" + stringToSend;
-                byte[] data = message.getBytes();
+                byte[] data = stringToSend.getBytes();
                 DatagramPacket packet = new DatagramPacket(data, data.length, remote, port);
                 socket.send(packet);
             }
@@ -69,5 +67,4 @@ public class Sender implements Runnable{
             e.printStackTrace();
         }
     }
-
 }

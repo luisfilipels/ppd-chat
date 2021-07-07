@@ -29,7 +29,12 @@ public class Receiver implements Runnable{
 
     void handlePing(String author) {
         // TODO: Check lecture for unequal radius conditions
-        MainViewController.addContact(author);
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                MainViewController.addContact(author);
+            }
+        });
     }
 
     @Override
@@ -48,6 +53,7 @@ public class Receiver implements Runnable{
                 if (parts[0].equals("chat")) {
                     handleChat(parts[1], parts[2]);
                 } else if (parts[0].equals("ping")) {
+                    System.out.println("Received ping from " + parts[1]);
                     handlePing(parts[1]);
                 } else {
                     System.out.println("Message with invalid header received! Header: " + parts[0]);

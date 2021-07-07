@@ -54,16 +54,34 @@ public class NetworkHandlerSingleton {
         manager.addSelfToTrackerIfUserExists(getMyIP());
     }
 
-    public void sendMessageTo(String user, String message) throws AcquireTupleException {
-        if (!manager.userIsReachable(user)) {
+    public void sendChatMessage(String to, String message) throws AcquireTupleException {
+        if (!manager.userIsReachable(to)) {
             // TODO: Do asynchronous communication here
             return;
         }
 
-        String userAddress = manager.getUserIP(user);
+        String userAddress = manager.getUserIP(to);
 
         String ip = userAddress.split("\\|")[0];
         String port = userAddress.split("\\|")[1];
+
+        message = "chat|" + ClientDataSingleton.getInstance().userID + "|" + message;
+
+        sender.setStringToSend(message, ip, Integer.parseInt(port));
+    }
+
+    private void sendPingMessage(String to, String from) throws AcquireTupleException {
+        if (!manager.userIsReachable(to)) {
+            // TODO: Do asynchronous communication here
+            return;
+        }
+
+        String userAddress = manager.getUserIP(to);
+
+        String ip = userAddress.split("\\|")[0];
+        String port = userAddress.split("\\|")[1];
+
+        String message = "ping|" + ClientDataSingleton.getInstance().userID;
 
         sender.setStringToSend(message, ip, Integer.parseInt(port));
     }
@@ -102,5 +120,14 @@ public class NetworkHandlerSingleton {
 
         t1.start();
         t2.start();
+    }
+
+    public void pingUser(String contact) throws AcquireTupleException {
+        if (!manager.userIsReachable(contact)) {
+            // TODO: Do asynchronous communication here
+            return;
+        }
+        ClientDataSingleton clientData = ClientDataSingleton.getInstance();
+        sendPingMessage(contact, clientData.userID);
     }
 }
