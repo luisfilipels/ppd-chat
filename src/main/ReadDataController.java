@@ -14,6 +14,8 @@ import utils.ClientDataSingleton;
 import utils.exceptions.AcquireTupleException;
 import utils.exceptions.WriteTupleException;
 
+import java.net.SocketException;
+
 public class ReadDataController {
 
     @FXML
@@ -37,6 +39,9 @@ public class ReadDataController {
     @FXML
     private Text failedConnectionText;
 
+    @FXML
+    private TextField listenPortField;
+
     private NetworkHandlerSingleton networkHandler;
     private ClientDataSingleton clientData;
 
@@ -57,6 +62,7 @@ public class ReadDataController {
         clientData.detectionRadius = Integer.parseInt(radiusField.getText());
         clientData.userID = userIDField.getText();
         clientData.userNick = nickField.getText();
+        clientData.receivePort = Integer.parseInt(listenPortField.getText());
 
         clientData.initialOnlineStatus = onlineStatusBox.isSelected();
 
@@ -65,7 +71,12 @@ public class ReadDataController {
         if (!connectToUserSpace()) return;
         if (!loginUser()) return;
 
-        networkHandler.startSocket();
+        try {
+            networkHandler.startSocket();
+        } catch (SocketException e) {
+            System.out.println("Couldn't start sockets!");
+            e.printStackTrace();
+        }
 
         System.out.println("Adding self to tracker");
         networkHandler.addSelfToTracker();

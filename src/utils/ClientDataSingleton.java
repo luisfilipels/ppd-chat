@@ -12,6 +12,7 @@ public class ClientDataSingleton {
     public boolean initialOnlineStatus;
     public int initialLatitude = 0;
     public int initialLongitude = 0;
+    public int receivePort;
 
     public int detectionRadius = 10;
 

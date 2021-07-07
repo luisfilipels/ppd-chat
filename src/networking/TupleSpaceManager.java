@@ -8,6 +8,8 @@ import utils.exceptions.WriteTupleException;
 import utils.tuples.UserTrackerTuple;
 import utils.tuples.UserTuple;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -155,7 +157,7 @@ public class TupleSpaceManager {
         writeUserTracker(auctionTracker);
     }
 
-    public void addSelfToTrackerIfUserExists() {
+    public void addSelfToTrackerIfUserExists(String myIP) {
         ClientDataSingleton clientData = ClientDataSingleton.getInstance();
 
         try {
@@ -172,7 +174,7 @@ public class TupleSpaceManager {
                 throw new AcquireTupleException();
             }
 
-            tracker.userToIPList.put(myUser.userID, "");
+            tracker.userToIPList.put(myUser.userID, myIP + "|" + clientData.receivePort);
 
             writeUserTracker(tracker);
             writeUser(myUser);
@@ -181,7 +183,6 @@ public class TupleSpaceManager {
 
         } catch (AcquireTupleException e) {
             e.printStackTrace();
-            return;
         } catch (WriteTupleException e) {
             e.printStackTrace();
         }
@@ -214,5 +215,11 @@ public class TupleSpaceManager {
         }
 
         return returnList;
+    }
+
+    public String getUserIP(String userID) throws AcquireTupleException {
+        UserTrackerTuple userTracker = readUserTracker(6000);
+
+        return userTracker.userToIPList.get(userID);
     }
 }

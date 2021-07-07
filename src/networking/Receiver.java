@@ -2,6 +2,7 @@ package networking;
 
 import javafx.application.Platform;
 import main.MainViewController;
+import utils.ClientDataSingleton;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -16,6 +17,8 @@ public class Receiver implements Runnable{
     }
 
     void handleChat(String sender, String message) {
+        //if (sender.equals(ClientDataSingleton.getInstance().userID)) return;
+        System.out.println(sender + ":" + message);
         MainViewController.logMessage(sender + ": " + message);
     }
 
@@ -32,6 +35,7 @@ public class Receiver implements Runnable{
 
             while (true) {
                 socket.receive(pacote);
+                System.out.println("Packet received");
                 String contents = new String(pacote.getData(), 0, pacote.getLength());
 
                 String[] parts = contents.split("\\|");
@@ -46,7 +50,9 @@ public class Receiver implements Runnable{
 
                 pacote.setLength(buffer.length);
             }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

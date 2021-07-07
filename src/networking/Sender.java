@@ -1,5 +1,7 @@
 package networking;
 
+import utils.ClientDataSingleton;
+
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -21,15 +23,17 @@ public class Sender implements Runnable{
 
     private String stringToSend;
     private String address;
+    private int port;
 
-    public void setStringToSend(String string, String address) {
+    public void setStringToSend(String string, String address, int port) {
         this.stringToSend = string;
         this.address = address;
+        this.port = port;
         s.release();
         // Releases the mutex so the thread can continue to run
     }
 
-    public void waitForData() {
+    private void waitForData() {
         try {
             s.acquire();
         } catch (InterruptedException e) {
@@ -40,14 +44,16 @@ public class Sender implements Runnable{
     @Override
     public void run() {
         try {
+            InetAddress remote = InetAddress.getByName("localhost");
+
             while (true) {
                 waitForData();
 
-                InetAddress remote = InetAddress.getByName(address);
+                System.out.println("Sending data to address " + address);
 
-                String message = stringToSend;
+                String message = "chat|" + ClientDataSingleton.getInstance().userID + "|" + stringToSend;
                 byte[] data = message.getBytes();
-                DatagramPacket packet = new DatagramPacket(data, data.length, remote, 1026);
+                DatagramPacket packet = new DatagramPacket(data, data.length, remote, 1025);
                 socket.send(packet);
             }
             /*InetAddress server = InetAddress.getByName(SessionDataSingleton.getInstance().getRemoteAddress());

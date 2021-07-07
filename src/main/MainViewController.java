@@ -10,6 +10,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
 import networking.NetworkHandlerSingleton;
 import utils.ClientDataSingleton;
+import utils.exceptions.AcquireTupleException;
 
 import java.util.HashSet;
 import java.util.List;
@@ -17,8 +18,8 @@ import java.util.List;
 public class MainViewController {
 
     @FXML
-    private ListView<HBox> chatListView;
-    private ObservableList<HBox> chatList;
+    private ListView<String> chatListView;
+    private static ObservableList<String> chatList;
 
     @FXML
     private ListView<HBox> contactsListView;
@@ -58,12 +59,28 @@ public class MainViewController {
     @FXML
     private TextField latitudeField;
 
+    @FXML
+    private TextField messageField;
+
     private NetworkHandlerSingleton networkHandler;
     private ClientDataSingleton clientData;
 
     @FXML
     void onUpdateContactsClick() {
         updateContactList();
+    }
+
+    @FXML
+    void onSendMessage() {
+        String message = messageField.getText();
+        for (String contact : contactsAdded) {
+            try {
+                networkHandler.sendMessageTo(contact, message);
+            } catch (AcquireTupleException e) {
+                System.out.println("Couldn't send message to " + contact + "!");
+                e.printStackTrace();
+            }
+        }
     }
 
     @FXML
@@ -84,6 +101,7 @@ public class MainViewController {
 
     public static void logMessage(String message) {
         // TODO: Implement this
+        chatList.add(message);
     }
 
     public void updateContactList() {
