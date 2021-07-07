@@ -75,14 +75,20 @@ public class MainViewController {
     @FXML
     void onSendMessage() {
         String message = messageField.getText();
-        for (String contact : contactsAdded) {
+        int countSelected = 0;
+        for (ContactEntryHBox contact : contactsList) {
+            if (contact.selectedCheckbox.isSelected()) countSelected++;
+        }
+        for (ContactEntryHBox contact : contactsList) {
+            if (!contact.selectedCheckbox.isSelected() && countSelected > 0) continue;
             try {
-                networkHandler.sendChatMessage(contact, message);
+                networkHandler.sendChatMessage(contact.userID, message);
             } catch (AcquireTupleException e) {
                 System.out.println("Couldn't send message to " + contact + "!");
                 e.printStackTrace();
             }
         }
+        logMessage("(Você): " + message);
     }
 
     @FXML
@@ -127,7 +133,7 @@ public class MainViewController {
 
         contactsAdded.add(contact);
 
-        ContactEntryHBox hBox = new ContactEntryHBox(contact);
+
         Text text = new Text(contact);
         Region spacer = new Region();
         CheckBox checkBox = new CheckBox("Send message?");
@@ -144,7 +150,7 @@ public class MainViewController {
                 contactsList.remove(boxToBeRemoved);
             }
         });
-
+        ContactEntryHBox hBox = new ContactEntryHBox(contact, checkBox);
         hBox.getChildren().addAll(text, spacer, checkBox, deleteButton);
         hBox.setHgrow(spacer, Priority.ALWAYS);
 
