@@ -44,16 +44,16 @@ public class Sender implements Runnable{
     @Override
     public void run() {
         try {
-            InetAddress remote = InetAddress.getByName("localhost");
 
             while (true) {
                 waitForData();
 
+                InetAddress remote = InetAddress.getByName(address);
                 System.out.println("Sending data to address " + address);
 
                 String message = "chat|" + ClientDataSingleton.getInstance().userID + "|" + stringToSend;
                 byte[] data = message.getBytes();
-                DatagramPacket packet = new DatagramPacket(data, data.length, remote, 1025);
+                DatagramPacket packet = new DatagramPacket(data, data.length, remote, port);
                 socket.send(packet);
             }
             /*InetAddress server = InetAddress.getByName(SessionDataSingleton.getInstance().getRemoteAddress());

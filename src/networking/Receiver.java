@@ -17,9 +17,14 @@ public class Receiver implements Runnable{
     }
 
     void handleChat(String sender, String message) {
-        //if (sender.equals(ClientDataSingleton.getInstance().userID)) return;
+        if (sender.equals(ClientDataSingleton.getInstance().userID)) return;
         System.out.println(sender + ":" + message);
-        MainViewController.logMessage(sender + ": " + message);
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                MainViewController.logMessage(sender + ": " + message);
+            }
+        });
     }
 
     void handlePing(String author) {
