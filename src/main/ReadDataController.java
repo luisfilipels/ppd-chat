@@ -17,6 +17,8 @@ import utils.exceptions.AcquireTupleException;
 import utils.exceptions.WriteTupleException;
 
 import javax.jms.JMSException;
+import javax.swing.*;
+import java.awt.event.ActionListener;
 import java.net.BindException;
 import java.net.SocketException;
 
@@ -58,11 +60,49 @@ public class ReadDataController {
         String userName = userIDField.getText().trim();
 
         // TODO: Add input validation for all of these fields
-        clientData.initialLongitude = Integer.parseInt(longitudeField.getText());
-        clientData.initialLatitude = Integer.parseInt(latitudeField.getText());
-        clientData.detectionRadius = Integer.parseInt(radiusField.getText());
-        clientData.userNick = userIDField.getText();
-        clientData.userName = nickField.getText();
+
+        boolean longitudeFailed = false;
+        try {
+            clientData.initialLongitude = Integer.parseInt(latitudeField.getText());
+        } catch (NumberFormatException e) {
+            longitudeFailed = true;
+        }
+
+        boolean latitudeFailed = false;
+        try {
+            clientData.initialLatitude = Integer.parseInt(latitudeField.getText());
+        } catch (NumberFormatException e) {
+            latitudeFailed = true;
+        }
+
+        boolean radiusFailed = false;
+        try {
+            clientData.detectionRadius = Integer.parseInt(radiusField.getText());
+            if (clientData.detectionRadius < 0) throw new NumberFormatException();
+        } catch (NumberFormatException e) {
+            radiusFailed = true;
+        }
+
+        if (longitudeFailed) showErrorOnField(longitudeField);
+        if (latitudeFailed) showErrorOnField(latitudeField);
+        if (radiusFailed) showErrorOnField(radiusField);
+
+        boolean userNickFailed = false;
+        clientData.userNick = userIDField.getText().trim();
+        if (clientData.userNick.isEmpty()) {
+            showErrorOnField(userIDField, "Não pode estar vazio!");
+            userNickFailed = true;
+        }
+
+        boolean userNameFailed = false;
+        clientData.userName = nickField.getText().trim();
+        if (clientData.userName.isEmpty()) {
+            showErrorOnField(nickField, "Não pode estar vazio!");
+            userNameFailed = true;
+        }
+
+        if (longitudeFailed || latitudeFailed || radiusFailed
+            || userNickFailed || userNameFailed) return;
 
         clientData.initialOnlineStatus = onlineStatusBox.isSelected();
 
@@ -91,8 +131,6 @@ public class ReadDataController {
                 System.exit(0);
             }
         }
-
-
 
         System.out.println("Adding self to tracker");
         networkHandler.addSelfToTracker();
@@ -166,6 +204,45 @@ public class ReadDataController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    Integer getValueFromField(TextField field) throws NumberFormatException{
+        int value = -1;
+        try {
+            value = Integer.parseInt(field.getText());
+        } catch (NumberFormatException ex) {
+            showErrorOnField(field);
+            throw new NumberFormatException();
+        }
+        return value;
+    }
+
+    void showErrorOnField(TextField field) {
+        field.setText("Valor inválido!");
+        field.setDisable(true);
+        Timer refreshTimer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
+                field.setDisable(false);
+                field.clear();
+            }
+        });
+        refreshTimer.setRepeats(false);
+        refreshTimer.start();
+    }
+
+    void showErrorOnField(TextField field, String message) {
+        field.setText(message);
+        field.setDisable(true);
+        Timer refreshTimer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
+                field.setDisable(false);
+                field.clear();
+            }
+        });
+        refreshTimer.setRepeats(false);
+        refreshTimer.start();
     }
 
 }
