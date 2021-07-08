@@ -17,6 +17,7 @@ import utils.exceptions.AcquireTupleException;
 import utils.exceptions.WriteTupleException;
 
 import javax.jms.JMSException;
+import java.net.BindException;
 import java.net.SocketException;
 
 public class ReadDataController {
@@ -42,9 +43,6 @@ public class ReadDataController {
     @FXML
     private Text failedConnectionText;
 
-    @FXML
-    private TextField listenPortField;
-
     private NetworkHandlerSingleton networkHandler;
     private ClientDataSingleton clientData;
 
@@ -65,7 +63,7 @@ public class ReadDataController {
         clientData.detectionRadius = Integer.parseInt(radiusField.getText());
         clientData.userNick = userIDField.getText();
         clientData.userName = nickField.getText();
-        clientData.receivePort = Integer.parseInt(listenPortField.getText());
+        //clientData.receivePort = Integer.parseInt(listenPortField.getText());
 
         clientData.initialOnlineStatus = onlineStatusBox.isSelected();
 
@@ -79,12 +77,23 @@ public class ReadDataController {
             System.out.println("Couldn't login user!");
         }
 
-        try {
-            networkHandler.startSocket();
-        } catch (SocketException e) {
-            System.out.println("Couldn't start sockets!");
-            e.printStackTrace();
+        int tryPort = 1025;
+        while (true) {
+            clientData.receivePort = tryPort;
+            try {
+                networkHandler.startSocket();
+                break;
+            } catch (BindException e) {
+                System.out.println("Socket in use! Trying another...");
+                tryPort++;
+            } catch (SocketException e) {
+                System.out.println("Couldn't start sockets!");
+                e.printStackTrace();
+                System.exit(0);
+            }
         }
+
+
 
         System.out.println("Adding self to tracker");
         networkHandler.addSelfToTracker();

@@ -99,7 +99,7 @@ public class MainViewController {
         try {
             networkHandler = NetworkHandlerSingleton.getInstance();
         } catch (Exception e) {
-            System.out.println("Could not prepare JavaSpace for auctions!");
+            System.out.println("Could not get network handler!");
             e.printStackTrace();
             System.exit(0);
         }
