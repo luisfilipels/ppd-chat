@@ -290,7 +290,9 @@ public class MainViewController {
                 for (String s : list) {
                     String[] messageParts = s.split("\\|");
                     String userNick = messageParts[1];
-                    String message = messageParts[2];
+                    String destination = messageParts[2];
+                    if (!clientData.userNick.equals(destination)) continue;
+                    String message = messageParts[3];
                     String userName = networkHandler.getUserName(userNick);
                     logMessage(userName + "(" + userNick + "):" + message);
                 }

@@ -60,7 +60,7 @@ public class NetworkHandlerSingleton {
 
     public void sendChatMessage(String to, String message) throws AcquireTupleException, JMSException, IllegalAccessException {
         if (!manager.userIsReachable(to)) {
-            producer.produceMessage(to, "chat|" + ClientDataSingleton.getInstance().userNick + "|" + message);
+            producer.produceMessage(to, "chat|" + ClientDataSingleton.getInstance().userNick + "|" + to + "|" + message);
             return;
         }
 
