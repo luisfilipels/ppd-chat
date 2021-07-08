@@ -63,16 +63,21 @@ public class ReadDataController {
         clientData.initialLongitude = Integer.parseInt(longitudeField.getText());
         clientData.initialLatitude = Integer.parseInt(latitudeField.getText());
         clientData.detectionRadius = Integer.parseInt(radiusField.getText());
-        clientData.userID = userIDField.getText();
-        clientData.userNick = nickField.getText();
+        clientData.userNick = userIDField.getText();
+        clientData.userName = nickField.getText();
         clientData.receivePort = Integer.parseInt(listenPortField.getText());
 
         clientData.initialOnlineStatus = onlineStatusBox.isSelected();
 
         System.out.println("Got data from input");
 
-        if (!connectToUserSpace()) return;
-        if (!loginUser()) return;
+        if (!connectToUserSpace()) {
+            System.out.println("Couldn't connect to user space!");
+            return;
+        }
+        if (!loginUser()) {
+            System.out.println("Couldn't login user!");
+        }
 
         try {
             networkHandler.startSocket();

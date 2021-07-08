@@ -16,13 +16,14 @@ public class Receiver implements Runnable{
         this.socket = socket;
     }
 
-    void handleChat(String sender, String message) {
-        if (sender.equals(ClientDataSingleton.getInstance().userID)) return;
-        System.out.println(sender + ":" + message);
+    void handleChat(String senderNick, String message) {
+        if (senderNick.equals(ClientDataSingleton.getInstance().userNick)) return;
+        String senderName = NetworkHandlerSingleton.getInstance().getUserName(senderNick);
+        System.out.println(senderName + "(" + senderNick + "):" + message);
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                MainViewController.logMessage(sender + ": " + message);
+                MainViewController.logMessage(senderName + "(" + senderNick + "):" + message);
             }
         });
     }

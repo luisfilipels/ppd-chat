@@ -2,12 +2,9 @@ package utils.tuples;
 
 import net.jini.core.entry.Entry;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class UserTuple implements Entry {
-    public String userID;
     public String userNick;
+    public String userName;
 
     public Integer latitude;
     public Integer longitude;
@@ -16,13 +13,13 @@ public class UserTuple implements Entry {
 
     public UserTuple() {}
 
-    public UserTuple(String userID) {
-        this.userID = userID;
+    public UserTuple(String userNick) {
+        this.userNick = userNick;
     }
 
-    public UserTuple(String userID, String userNick, int latitude, int longitude, boolean isOnline) {
-        this.userID = userID;
+    public UserTuple(String userNick, String userName, int latitude, int longitude, boolean isOnline) {
         this.userNick = userNick;
+        this.userName = userName;
         this.latitude = latitude;
         this.longitude = longitude;
         this.isOnline = isOnline;
@@ -31,8 +28,8 @@ public class UserTuple implements Entry {
     @Override
     public String toString() {
         return "UserTuple{" +
-                "userID='" + userID + '\'' +
-                ", userNick='" + userNick + '\'' +
+                "userID='" + userNick + '\'' +
+                ", userNick='" + userName + '\'' +
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
                 ", isOnline=" + isOnline +

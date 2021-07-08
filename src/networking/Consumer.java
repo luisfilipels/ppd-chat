@@ -1,7 +1,6 @@
 package networking;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.ActiveMQQueueBrowser;
 import utils.ClientDataSingleton;
 
 import javax.jms.*;
@@ -24,7 +23,7 @@ public class Consumer {
 
         session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
-        destination = session.createQueue(ClientDataSingleton.getInstance().userID);
+        destination = session.createQueue(ClientDataSingleton.getInstance().userNick);
 
         consumer = session.createConsumer(destination);
         consumerStarted = true;

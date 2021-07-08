@@ -60,7 +60,7 @@ public class NetworkHandlerSingleton {
 
     public void sendChatMessage(String to, String message) throws AcquireTupleException, JMSException, IllegalAccessException {
         if (!manager.userIsReachable(to)) {
-            producer.produceMessage(to, "chat|" + ClientDataSingleton.getInstance().userID + "|" + message);
+            producer.produceMessage(to, "chat|" + ClientDataSingleton.getInstance().userNick + "|" + message);
             return;
         }
 
@@ -69,7 +69,7 @@ public class NetworkHandlerSingleton {
         String ip = userAddress.split("\\|")[0];
         String port = userAddress.split("\\|")[1];
 
-        message = "chat|" + ClientDataSingleton.getInstance().userID + "|" + message;
+        message = "chat|" + ClientDataSingleton.getInstance().userNick + "|" + message;
 
         sender.setStringToSend(message, ip, Integer.parseInt(port));
     }
@@ -85,7 +85,7 @@ public class NetworkHandlerSingleton {
         String ip = userAddress.split("\\|")[0];
         String port = userAddress.split("\\|")[1];
 
-        String message = "ping|" + ClientDataSingleton.getInstance().userID;
+        String message = "ping|" + ClientDataSingleton.getInstance().userNick;
 
         sender.setStringToSend(message, ip, Integer.parseInt(port));
     }
@@ -148,7 +148,7 @@ public class NetworkHandlerSingleton {
             return;
         }
         ClientDataSingleton clientData = ClientDataSingleton.getInstance();
-        sendPingMessage(contact, clientData.userID);
+        sendPingMessage(contact, clientData.userNick);
     }
 
     public void setMyselfToOffline() {
@@ -170,6 +170,16 @@ public class NetworkHandlerSingleton {
         } catch (AcquireTupleException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    public String getUserName(String contactNick) {
+        try {
+            return manager.getUserName(contactNick);
+        } catch (AcquireTupleException e) {
+            System.out.println("Could not acquire user name!");
+            e.printStackTrace();
+            return "<USER NAME NOT FOUND>";
         }
     }
 }

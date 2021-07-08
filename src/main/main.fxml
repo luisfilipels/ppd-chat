@@ -50,7 +50,6 @@
                         <Font size="13.0" />
                      </font>
                   </Text>
-                  <Button fx:id="createAuctionButton" layoutX="14.0" layoutY="441.0" mnemonicParsing="false" text="Confirmar" />
                   <Text fx:id="latitudeText" fill="WHITE" layoutX="16.0" layoutY="370.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Latitude">
                      <font>
                         <Font size="13.0" />
@@ -58,7 +57,6 @@
                   </Text>
                   <Text fx:id="contactRadiusErrorText" fill="#fdff52" layoutX="161.0" layoutY="318.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Este campo nao pode estar vazio!" />
                   <Text fx:id="contactListErrorText" fill="#fdff52" layoutX="17.0" layoutY="62.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Problema atualizando a lista!" />
-                  <Text fx:id="changeDataErrorText" fill="#fdff52" layoutX="102.0" layoutY="457.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Nao foi possivel alterar dados!" />
                   <TextField fx:id="latitudeField" layoutX="17.0" layoutY="373.0" onAction="#onLatitudeFieldAction" />
                   <TextField fx:id="longitudeField" layoutX="212.0" layoutY="373.0" onAction="#onLongitudeFieldAction" />
                   <Text fx:id="longitudeText" fill="WHITE" layoutX="212.0" layoutY="370.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Longitude" />

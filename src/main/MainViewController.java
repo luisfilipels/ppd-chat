@@ -43,9 +43,6 @@ public class MainViewController {
 
     @FXML
     private Text contactRadiusErrorText;
-    
-    @FXML
-    private Text changeDataErrorText;
 
     @FXML
     private Text radiusText;
@@ -86,7 +83,7 @@ public class MainViewController {
         for (ContactEntryHBox contact : contactsList) {
             if (!contact.selectedCheckbox.isSelected() && countSelected > 0) continue;
             try {
-                networkHandler.sendChatMessage(contact.userID, message);
+                networkHandler.sendChatMessage(contact.userNick, message);
             } catch (AcquireTupleException | JMSException | IllegalAccessException e) {
                 System.out.println("Couldn't send message to " + contact + "!");
                 e.printStackTrace();
@@ -124,22 +121,22 @@ public class MainViewController {
         }
     }
 
-    public static void addContact(String contact) {
+    public static void addContact(String contactNick) {
         ClientDataSingleton clientData = ClientDataSingleton.getInstance();
-        if (contactsAdded.contains(contact) || contact.equals(clientData.userID)) return;
+        if (contactsAdded.contains(contactNick) || contactNick.equals(clientData.userNick)) return;
 
         try {
-            System.out.println("Pinging user " + contact);
-            NetworkHandlerSingleton.getInstance().pingUser(contact);
+            System.out.println("Pinging user " + contactNick);
+            NetworkHandlerSingleton.getInstance().pingUser(contactNick);
         } catch (AcquireTupleException e) {
-            System.out.println("Couldn't ping user " + contact + "!");
+            System.out.println("Couldn't ping user " + contactNick + "!");
             e.printStackTrace();
         }
 
-        contactsAdded.add(contact);
+        contactsAdded.add(contactNick);
+        String contactName = NetworkHandlerSingleton.getInstance().getUserName(contactNick);
 
-
-        Text text = new Text(contact);
+        Text text = new Text(contactName + " (" + contactNick + ")");
         Region spacer = new Region();
         CheckBox checkBox = new CheckBox("Send message?");
         Button deleteButton = new Button("Excluir");
@@ -147,15 +144,15 @@ public class MainViewController {
         deleteButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                contactsAdded.remove(contact);
+                contactsAdded.remove(contactNick);
                 ContactEntryHBox boxToBeRemoved = null;
                 for (ContactEntryHBox hbox : contactsList) {
-                    if (hbox.userID.equals(contact)) boxToBeRemoved = hbox;
+                    if (hbox.userNick.equals(contactNick)) boxToBeRemoved = hbox;
                 }
                 contactsList.remove(boxToBeRemoved);
             }
         });
-        ContactEntryHBox hBox = new ContactEntryHBox(contact, checkBox);
+        ContactEntryHBox hBox = new ContactEntryHBox(contactNick, contactName, checkBox);
         hBox.getChildren().addAll(text, spacer, checkBox, deleteButton);
         hBox.setHgrow(spacer, Priority.ALWAYS);
 
@@ -175,7 +172,6 @@ public class MainViewController {
         contactRadiusErrorText.setOpacity(0);
         chatViewErrorText.setOpacity(0);
         contactListErrorText.setOpacity(0);
-        changeDataErrorText.setOpacity(0);
     }
 
     private void setUpReadings() {
@@ -293,7 +289,10 @@ public class MainViewController {
                 List<String> list = networkHandler.getConsumerMessages();
                 for (String s : list) {
                     String[] messageParts = s.split("\\|");
-                    logMessage(messageParts[1] + ": " + messageParts[2]);
+                    String userNick = messageParts[1];
+                    String message = messageParts[2];
+                    String userName = networkHandler.getUserName(userNick);
+                    logMessage(userName + "(" + userNick + "):" + message);
                 }
             } catch (JMSException | IllegalAccessException | NullPointerException e) {
                 System.out.println("Couldn't get queue messages!");

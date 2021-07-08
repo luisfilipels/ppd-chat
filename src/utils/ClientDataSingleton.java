@@ -7,8 +7,8 @@ public class ClientDataSingleton {
     private static ClientDataSingleton instance;
     private ClientDataSingleton() { }
 
+    public String userName = "";
     public String userNick = "";
-    public String userID = "";
     public boolean initialOnlineStatus;
     public int initialLatitude = 0;
     public int initialLongitude = 0;
@@ -26,6 +26,6 @@ public class ClientDataSingleton {
     }
 
     public void saveUserDataFromTuple(UserTuple user) {
-        this.userNick = user.userID;
+        this.userName = user.userNick;
     }
 }

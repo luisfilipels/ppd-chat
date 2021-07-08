@@ -8,8 +8,6 @@ import utils.exceptions.WriteTupleException;
 import utils.tuples.UserTrackerTuple;
 import utils.tuples.UserTuple;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,22 +28,22 @@ public class TupleSpaceManager {
     public void loginUser() throws AcquireTupleException, WriteTupleException {
         ClientDataSingleton clientData = ClientDataSingleton.getInstance();
 
-        UserTuple template = new UserTuple(clientData.userID);
+        UserTuple template = new UserTuple(clientData.userNick);
 
         UserTuple userToEnter = takeUser(template, 6000);
 
         if (userToEnter != null) {
             // User exists
             System.out.println("User exists. Writing read data to client data");
-            userToEnter.userNick = clientData.userNick;
+            userToEnter.userName = clientData.userName;
 
 
         } else {
             // User does not exist, so create and proceed
             System.out.println("User does not exist. Writing client data to tuple");
             userToEnter = template;
+            userToEnter.userName = clientData.userName;
             userToEnter.userNick = clientData.userNick;
-            userToEnter.userID = clientData.userID;
         }
 
         userToEnter.isOnline = clientData.initialOnlineStatus;
@@ -93,7 +91,7 @@ public class TupleSpaceManager {
 
     public void updateUserProperties(Integer latitude, Integer longitude, Boolean isOnline) throws AcquireTupleException, WriteTupleException {
         ClientDataSingleton clientData = ClientDataSingleton.getInstance();
-        UserTuple myUser = takeUser(new UserTuple(clientData.userID), 6000);
+        UserTuple myUser = takeUser(new UserTuple(clientData.userNick), 6000);
         if (myUser == null) {
             throw new AcquireTupleException();
         }
@@ -163,7 +161,7 @@ public class TupleSpaceManager {
     public boolean userIsReachable(String userID) {
         try {
             ClientDataSingleton clientData = ClientDataSingleton.getInstance();
-            UserTuple myUser = readUser(new UserTuple(clientData.userID), 6000);
+            UserTuple myUser = readUser(new UserTuple(clientData.userNick), 6000);
             UserTuple otherUser = readUser(new UserTuple(userID), 6000);
             if (otherUser == null) throw new AcquireTupleException();
 
@@ -179,7 +177,7 @@ public class TupleSpaceManager {
         ClientDataSingleton clientData = ClientDataSingleton.getInstance();
 
         try {
-            UserTuple myUser = takeUser(new UserTuple(clientData.userID), 6000);
+            UserTuple myUser = takeUser(new UserTuple(clientData.userNick), 6000);
             if (myUser == null) {
                 System.out.println("Couldn't acquire user tuple!");
                 throw new AcquireTupleException();
@@ -192,7 +190,7 @@ public class TupleSpaceManager {
                 throw new AcquireTupleException();
             }
 
-            tracker.userToIPList.put(myUser.userID, myIP + "|" + clientData.receivePort);
+            tracker.userToIPList.put(myUser.userNick, myIP + "|" + clientData.receivePort);
 
             writeUserTracker(tracker);
             writeUser(myUser);
@@ -211,13 +209,13 @@ public class TupleSpaceManager {
         UserTrackerTuple tracker = readUserTracker(6000);
 
         ClientDataSingleton clientData = ClientDataSingleton.getInstance();
-        UserTuple myUser = readUser(new UserTuple(clientData.userID), 6000);
+        UserTuple myUser = readUser(new UserTuple(clientData.userNick), 6000);
 
         List<String> returnList = new ArrayList<>();
 
         for (String otherUserID : tracker.userToIPList.keySet()) {
-            if (otherUserID.trim().equals(myUser.userID.trim())) continue;
-            System.out.println("other user: " + otherUserID + "   my user: " + myUser.userID);
+            if (otherUserID.trim().equals(myUser.userNick.trim())) continue;
+            System.out.println("other user: " + otherUserID + "   my user: " + myUser.userNick);
 
             UserTuple otherUser = readUser(new UserTuple(otherUserID), 6000);
 
@@ -244,7 +242,7 @@ public class TupleSpaceManager {
 
     public void setMyselfToOffline() throws AcquireTupleException, WriteTupleException {
         ClientDataSingleton clientData = ClientDataSingleton.getInstance();
-        UserTuple myUser = takeUser(new UserTuple(clientData.userID), 6000);
+        UserTuple myUser = takeUser(new UserTuple(clientData.userNick), 6000);
 
         myUser.isOnline = false;
 
@@ -254,7 +252,7 @@ public class TupleSpaceManager {
     public boolean userIsInRange(String user) {
         try {
             ClientDataSingleton clientData = ClientDataSingleton.getInstance();
-            UserTuple myUser = readUser(new UserTuple(clientData.userID), 6000);
+            UserTuple myUser = readUser(new UserTuple(clientData.userNick), 6000);
             UserTuple otherUser = readUser(new UserTuple(user), 6000);
             if (otherUser == null) throw new AcquireTupleException();
 
@@ -266,7 +264,12 @@ public class TupleSpaceManager {
     }
 
     public boolean selfIsOnline() throws AcquireTupleException {
-        UserTuple myUser = readUser(new UserTuple(ClientDataSingleton.getInstance().userID), 6000);
+        UserTuple myUser = readUser(new UserTuple(ClientDataSingleton.getInstance().userNick), 6000);
         return myUser.isOnline;
+    }
+
+    public String getUserName(String contactNick) throws AcquireTupleException {
+        UserTuple user = readUser(new UserTuple(contactNick), 6000);
+        return user.userName;
     }
 }
