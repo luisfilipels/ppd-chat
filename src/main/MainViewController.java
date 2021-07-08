@@ -188,47 +188,67 @@ public class MainViewController {
 
     @FXML
     void onRadiusAction() {
-        // TODO: Do this for the other fields
-        int radius = -1;
-        try {
-            radius = Integer.parseInt(contactRadiusField.getText());
-            if (radius < 0) {
-                throw new NumberFormatException();
-            }
-        }  catch (NumberFormatException e) {
-            contactRadiusField.setText("Valor inválido!");
-            contactRadiusField.setDisable(true);
-            Timer refreshTimer = new Timer(1000, new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    contactRadiusField.setDisable(false);
-                    contactRadiusField.clear();
-                }
-            });
-            refreshTimer.setRepeats(false);
-            refreshTimer.start();
+        Integer radius = getValueFromField(contactRadiusField);
+        if (radius == null || radius < 0) {
+            showErrorOnField(contactRadiusField);
+            return;
         }
-        if (radius < 0) return;
         clientData.detectionRadius = radius;
         updateContactList();
         setNewRadiusText(radius);
         getQueuedMessagesIfOnline(networkHandler.amOnline());
+        contactRadiusField.clear();
     }
 
     @FXML
     void onLatitudeFieldAction() {
-        int latitude = Integer.parseInt(latitudeField.getText());
+        Integer latitude = getValueFromField(latitudeField);
+        if (latitude == null) {
+            showErrorOnField(latitudeField);
+            return;
+        }
         if (!updateMyUser(null, latitude, null)) return;
         updateContactList();
         setNewLatitudeText(latitude);
+        latitudeField.clear();
     }
 
     @FXML
     void onLongitudeFieldAction() {
-        int longitude = Integer.parseInt(longitudeField.getText());
+        Integer longitude = getValueFromField(longitudeField);
+        if (longitude == null) {
+            showErrorOnField(longitudeField);
+            return;
+        }
         if (!updateMyUser(longitude, null, null)) return;
         updateContactList();
         setNewLongitudeText(longitude);
+        longitudeField.clear();
+    }
+
+    Integer getValueFromField(TextField field) {
+        int value = -1;
+        try {
+            value = Integer.parseInt(field.getText());
+        } catch (NumberFormatException ex) {
+            showErrorOnField(field);
+            return null;
+        }
+        return value;
+    }
+
+    void showErrorOnField(TextField field) {
+        field.setText("Valor inválido!");
+        field.setDisable(true);
+        Timer refreshTimer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                field.setDisable(false);
+                field.clear();
+            }
+        });
+        refreshTimer.setRepeats(false);
+        refreshTimer.start();
     }
 
     @FXML
