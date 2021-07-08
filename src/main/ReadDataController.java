@@ -63,7 +63,6 @@ public class ReadDataController {
         clientData.detectionRadius = Integer.parseInt(radiusField.getText());
         clientData.userNick = userIDField.getText();
         clientData.userName = nickField.getText();
-        //clientData.receivePort = Integer.parseInt(listenPortField.getText());
 
         clientData.initialOnlineStatus = onlineStatusBox.isSelected();
 

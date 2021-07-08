@@ -16,8 +16,9 @@ public class Receiver implements Runnable{
         this.socket = socket;
     }
 
-    void handleChat(String senderNick, String message) {
-        if (senderNick.equals(ClientDataSingleton.getInstance().userNick)) return;
+    void handleChat(String senderNick, String destination, String message) {
+        ClientDataSingleton clientData = ClientDataSingleton.getInstance();
+        if (senderNick.equals(clientData.userNick) || !destination.equals(clientData.userNick)) return;
         String senderName = NetworkHandlerSingleton.getInstance().getUserName(senderNick);
         System.out.println(senderName + "(" + senderNick + "):" + message);
         Platform.runLater(new Runnable() {
@@ -28,12 +29,14 @@ public class Receiver implements Runnable{
         });
     }
 
-    void handlePing(String author) {
+    void handlePing(String from, String to) {
+        ClientDataSingleton clientData = ClientDataSingleton.getInstance();
+        if (!to.equals(clientData.userNick)) return;
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                if (NetworkHandlerSingleton.getInstance().userIsInRange(author)) {
-                    MainViewController.addContact(author);
+                if (NetworkHandlerSingleton.getInstance().userIsInRange(from)) {
+                    MainViewController.addContact(from);
                 }
             }
         });
@@ -53,10 +56,10 @@ public class Receiver implements Runnable{
                 String[] parts = contents.split("\\|");
 
                 if (parts[0].equals("chat")) {
-                    handleChat(parts[1], parts[2]);
+                    handleChat(parts[1], parts[2], parts[3]);
                 } else if (parts[0].equals("ping")) {
                     System.out.println("Received ping from " + parts[1]);
-                    handlePing(parts[1]);
+                    handlePing(parts[1], parts[2]);
                 } else {
                     System.out.println("Message with invalid header received! Header: " + parts[0]);
                 }

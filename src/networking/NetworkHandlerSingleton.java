@@ -69,7 +69,7 @@ public class NetworkHandlerSingleton {
         String ip = userAddress.split("\\|")[0];
         String port = userAddress.split("\\|")[1];
 
-        message = "chat|" + ClientDataSingleton.getInstance().userNick + "|" + message;
+        message = "chat|" + ClientDataSingleton.getInstance().userNick + "|" + to + "|" + message;
 
         sender.setStringToSend(message, ip, Integer.parseInt(port));
     }
@@ -85,7 +85,7 @@ public class NetworkHandlerSingleton {
         String ip = userAddress.split("\\|")[0];
         String port = userAddress.split("\\|")[1];
 
-        String message = "ping|" + ClientDataSingleton.getInstance().userNick;
+        String message = "ping|" + ClientDataSingleton.getInstance().userNick + "|" + to;
 
         sender.setStringToSend(message, ip, Integer.parseInt(port));
     }
