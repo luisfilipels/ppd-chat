@@ -74,9 +74,8 @@ public class NetworkHandlerSingleton {
         sender.setStringToSend(message, ip, Integer.parseInt(port));
     }
 
-    private void sendPingMessage(String to, String from) throws AcquireTupleException {
+    private void sendPingMessage(String to) throws AcquireTupleException {
         if (!manager.userIsReachable(to)) {
-            // TODO: Do asynchronous communication here
             return;
         }
 
@@ -144,11 +143,9 @@ public class NetworkHandlerSingleton {
 
     public void pingUser(String contact) throws AcquireTupleException {
         if (!manager.userIsReachable(contact)) {
-            // TODO: Do asynchronous communication here
             return;
         }
-        ClientDataSingleton clientData = ClientDataSingleton.getInstance();
-        sendPingMessage(contact, clientData.userNick);
+        sendPingMessage(contact);
     }
 
     public void setMyselfToOffline() {

@@ -54,15 +54,6 @@ public class Sender implements Runnable{
                 DatagramPacket packet = new DatagramPacket(data, data.length, remote, port);
                 socket.send(packet);
             }
-            /*InetAddress server = InetAddress.getByName(SessionDataSingleton.getInstance().getRemoteAddress());
-            int port = SessionDataSingleton.getInstance().getSendPort();
-
-            while (true) {
-                String message = getStringToSend();
-                byte[] data = message.getBytes();
-                DatagramPacket pacote = new DatagramPacket(data, data.length, server, port);
-                socket.send(pacote);
-            }*/
         } catch (Exception e) {
             e.printStackTrace();
         }

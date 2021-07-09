@@ -7,7 +7,6 @@ import javax.jms.*;
 
 public class Producer {
 
-    private MessageConsumer consumer;
     private Session session;
     private boolean producerStarted;
 

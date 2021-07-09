@@ -126,36 +126,9 @@ public class TupleSpaceManager {
             throw new AcquireTupleException();
         }
     }
-
-    private UserTrackerTuple prepareUserTrack() throws AcquireTupleException, WriteTupleException {
-        UserTrackerTuple auctionTracker = takeUserTracker(5000);
-        if (auctionTracker == null) {
-            writeUserTracker();
-            auctionTracker = takeUserTracker(5000);
-            if (auctionTracker == null) {
-                System.out.println("Could not acquire user tracker!");
-                throw new AcquireTupleException();
-            }
-        } else {
-            if (auctionTracker.userToIPList == null) {
-                auctionTracker.userToIPList = new HashMap<>();
-            }
-        }
-        return auctionTracker;
-    }
-
+    
     public boolean userTrackerExists() throws AcquireTupleException {
         return readUserTracker(5000) != null;
-    }
-
-    private void deleteUserFromTracker(String userID) throws AcquireTupleException, WriteTupleException {
-        UserTrackerTuple auctionTracker = takeUserTracker(6000);
-        if (auctionTracker == null) {
-            System.out.println("Couldn't get auction tracker!");
-            throw new AcquireTupleException();
-        }
-        auctionTracker.userToIPList.remove(userID);
-        writeUserTracker(auctionTracker);
     }
 
     public boolean userIsReachable(String userID) {
