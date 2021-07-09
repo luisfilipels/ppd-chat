@@ -70,11 +70,6 @@ public class MainViewController {
     private ClientDataSingleton clientData;
 
     @FXML
-    void onUpdateContactsClick() {
-        updateContactList();
-    }
-
-    @FXML
     void onSendMessage() {
         String messageToSend = messageField.getText();
         int countSelected = getCountOfSelectedContacts();

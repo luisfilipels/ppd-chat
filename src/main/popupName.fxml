@@ -10,7 +10,7 @@
    <children>
       <Button fx:id="confirmButton" layoutX="157.0" layoutY="263.0" mnemonicParsing="false" onAction="#onConfirmButton" prefHeight="44.0" prefWidth="87.0" text="Aceitar" />
       <Text layoutX="59.0" layoutY="76.0" strokeType="OUTSIDE" strokeWidth="0.0" text="ID de usuario" />
-      <TextField fx:id="userIDField" layoutX="59.0" layoutY="79.0" prefHeight="25.0" prefWidth="190.0" />
+      <TextField fx:id="userIDField" layoutX="59.0" layoutY="79.0" prefHeight="25.0" prefWidth="279.0" />
       <Text fx:id="failedConnectionText" fill="RED" layoutX="147.0" layoutY="254.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Conexão falhou!" />
       <Text layoutX="60.0" layoutY="173.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Latitude inicial" />
       <Text layoutX="217.0" layoutY="172.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Longitude inicial" />
@@ -19,7 +19,6 @@
       <TextField fx:id="radiusField" layoutX="61.0" layoutY="126.0" prefHeight="24.0" prefWidth="279.0" />
       <Text layoutX="59.0" layoutY="122.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Raio inicial" />
       <CheckBox fx:id="onlineStatusBox" layoutX="63.0" layoutY="214.0" mnemonicParsing="false" text="Iniciar com status online?" />
-      <Button layoutX="263.0" layoutY="80.0" mnemonicParsing="false" text="Aleatorio" />
       <TextField fx:id="nickField" layoutX="60.0" layoutY="33.0" prefHeight="24.0" prefWidth="279.0" />
       <Text layoutX="61.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Apelido" />
    </children>

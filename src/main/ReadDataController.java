@@ -58,54 +58,8 @@ public class ReadDataController {
     @FXML
     public void onConfirmButton(ActionEvent event) {
         String userName = userIDField.getText().trim();
-
-        // TODO: Add input validation for all of these fields
-
-        boolean longitudeFailed = false;
-        try {
-            clientData.initialLongitude = Integer.parseInt(latitudeField.getText());
-        } catch (NumberFormatException e) {
-            longitudeFailed = true;
-        }
-
-        boolean latitudeFailed = false;
-        try {
-            clientData.initialLatitude = Integer.parseInt(latitudeField.getText());
-        } catch (NumberFormatException e) {
-            latitudeFailed = true;
-        }
-
-        boolean radiusFailed = false;
-        try {
-            clientData.detectionRadius = Integer.parseInt(radiusField.getText());
-            if (clientData.detectionRadius < 0) throw new NumberFormatException();
-        } catch (NumberFormatException e) {
-            radiusFailed = true;
-        }
-
-        if (longitudeFailed) showErrorOnField(longitudeField);
-        if (latitudeFailed) showErrorOnField(latitudeField);
-        if (radiusFailed) showErrorOnField(radiusField);
-
-        boolean userNickFailed = false;
-        clientData.userNick = userIDField.getText().trim();
-        if (clientData.userNick.isEmpty()) {
-            showErrorOnField(userIDField, "Não pode estar vazio!");
-            userNickFailed = true;
-        }
-
-        boolean userNameFailed = false;
-        clientData.userName = nickField.getText().trim();
-        if (clientData.userName.isEmpty()) {
-            showErrorOnField(nickField, "Não pode estar vazio!");
-            userNameFailed = true;
-        }
-
-        if (longitudeFailed || latitudeFailed || radiusFailed
-            || userNickFailed || userNameFailed) return;
-
+        if (!tryToGetNumericalFields()) return;
         clientData.initialOnlineStatus = onlineStatusBox.isSelected();
-
         System.out.println("Got data from input");
 
         if (!connectToUserSpace()) {
@@ -115,7 +69,82 @@ public class ReadDataController {
         if (!loginUser()) {
             System.out.println("Couldn't login user!");
         }
+        getPortToBeUsed();
+        networkHandler.addSelfToTracker();
+        startProducerAndConsumer();
 
+        closeSelfWindow(event);
+        openMainWindowWithUserName(userName);
+    }
+
+    private boolean tryToGetNumericalFields() {
+        boolean longitudeFailed = acquireLongitude();
+        boolean latitudeFailed = acquireLatitude();
+        boolean radiusFailed = acquireRadius();
+
+        if (longitudeFailed) showErrorOnField(longitudeField, "Valor inválido!");
+        if (latitudeFailed) showErrorOnField(latitudeField, "Valor inválido!");
+        if (radiusFailed) showErrorOnField(radiusField, "Valor inválido!");
+
+        boolean userNickFailed = acquireUserNick();
+        boolean userNameFailed = acquireUserName();
+
+        return !longitudeFailed && !latitudeFailed && !radiusFailed
+                && !userNickFailed && !userNameFailed;
+    }
+
+    private boolean acquireLongitude() {
+        boolean longitudeFailed = false;
+        try {
+            clientData.initialLongitude = Integer.parseInt(longitudeField.getText());
+        } catch (NumberFormatException e) {
+            longitudeFailed = true;
+        }
+        return longitudeFailed;
+    }
+
+    private boolean acquireLatitude() {
+        boolean latitudeFailed = false;
+        try {
+            clientData.initialLatitude = Integer.parseInt(latitudeField.getText());
+        } catch (NumberFormatException e) {
+            latitudeFailed = true;
+        }
+        return latitudeFailed;
+    }
+
+    private boolean acquireRadius() {
+        boolean radiusFailed = false;
+        try {
+            clientData.detectionRadius = Integer.parseInt(radiusField.getText());
+            if (clientData.detectionRadius < 0) throw new NumberFormatException();
+        } catch (NumberFormatException e) {
+            radiusFailed = true;
+        }
+        return radiusFailed;
+    }
+
+    private boolean acquireUserNick() {
+        boolean userNickFailed = false;
+        clientData.userNick = userIDField.getText().trim();
+        if (clientData.userNick.isEmpty()) {
+            showErrorOnField(userIDField, "Não pode estar vazio!");
+            userNickFailed = true;
+        }
+        return userNickFailed;
+    }
+
+    private boolean acquireUserName() {
+        boolean userNameFailed = false;
+        clientData.userName = nickField.getText().trim();
+        if (clientData.userName.isEmpty()) {
+            showErrorOnField(nickField, "Não pode estar vazio!");
+            userNameFailed = true;
+        }
+        return userNameFailed;
+    }
+
+    private void getPortToBeUsed() {
         int tryPort = 1025;
         while (true) {
             clientData.receivePort = tryPort;
@@ -131,19 +160,16 @@ public class ReadDataController {
                 System.exit(0);
             }
         }
+    }
 
-        System.out.println("Adding self to tracker");
-        networkHandler.addSelfToTracker();
-
+    private void startProducerAndConsumer() {
         try {
             networkHandler.startProducerAndConsumer();
         } catch (JMSException e) {
             System.out.println("Couldn't initialize async message code!");
             e.printStackTrace();
+            System.exit(0);
         }
-
-        closeSelfWindow(event);
-        openMainWindowWithUserName(userName);
     }
 
     private boolean connectToUserSpace() {
@@ -206,33 +232,12 @@ public class ReadDataController {
         }
     }
 
-    Integer getValueFromField(TextField field) throws NumberFormatException{
-        int value = -1;
-        try {
-            value = Integer.parseInt(field.getText());
-        } catch (NumberFormatException ex) {
-            showErrorOnField(field);
-            throw new NumberFormatException();
-        }
-        return value;
-    }
-
-    void showErrorOnField(TextField field) {
-        field.setText("Valor inválido!");
-        field.setDisable(true);
-        Timer refreshTimer = new Timer(1000, new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
-                field.setDisable(false);
-                field.clear();
-            }
-        });
-        refreshTimer.setRepeats(false);
-        refreshTimer.start();
-    }
-
     void showErrorOnField(TextField field, String message) {
         field.setText(message);
+        showTemporaryErrorOnField(field);
+    }
+
+    private void showTemporaryErrorOnField(TextField field) {
         field.setDisable(true);
         Timer refreshTimer = new Timer(1000, new ActionListener() {
             @Override
