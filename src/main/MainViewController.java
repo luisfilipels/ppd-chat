@@ -13,6 +13,7 @@ import networking.NetworkHandlerSingleton;
 import utils.ClientDataSingleton;
 import utils.ContactEntryHBox;
 import utils.exceptions.AcquireTupleException;
+import utils.exceptions.WriteTupleException;
 
 import javax.jms.JMSException;
 import javax.swing.*;
@@ -42,7 +43,7 @@ public class MainViewController {
     private Text contactListErrorText;
 
     @FXML
-    private Text contactRadiusErrorText;
+    private Text onlineStatusErrorText;
 
     @FXML
     private Text radiusText;
@@ -75,27 +76,47 @@ public class MainViewController {
 
     @FXML
     void onSendMessage() {
-        String message = messageField.getText();
+        String messageToSend = messageField.getText();
+        int countSelected = getCountOfSelectedContacts();
+        sendMessageToSelectedContacts(messageToSend, countSelected);
+        logMessage("(Você): " + messageToSend);
+        messageField.clear();
+    }
+
+    private int getCountOfSelectedContacts() {
         int countSelected = 0;
         for (ContactEntryHBox contact : contactsList) {
             if (contact.selectedCheckbox.isSelected()) countSelected++;
         }
+        return countSelected;
+    }
+
+    private void sendMessageToSelectedContacts(String messageToSend, int countSelected) {
         for (ContactEntryHBox contact : contactsList) {
+            // If there is at least one selected box, and the current contact has not
+            // been selected, continue. The result of this is that, if no checkbox is
+            // selected, we send the message to all contacts in range.
             if (!contact.selectedCheckbox.isSelected() && countSelected > 0) continue;
             try {
-                networkHandler.sendChatMessage(contact.userNick, message);
+                networkHandler.sendChatMessage(contact.userNick, messageToSend);
             } catch (AcquireTupleException | JMSException | IllegalAccessException e) {
-                System.out.println("Couldn't send message to " + contact + "!");
+                logMessage("Couldn't send message to " + contact + "!");
                 e.printStackTrace();
             }
         }
-        logMessage("(Você): " + message);
-        messageField.clear();
     }
 
     @FXML
     void initialize() {
         clientData = ClientDataSingleton.getInstance();
+        getNetworkHandlerOrExit();
+        setUpLists();
+        setUpErrors();
+        updateContactList();
+        setUpReadings();
+    }
+
+    private void getNetworkHandlerOrExit() {
         try {
             networkHandler = NetworkHandlerSingleton.getInstance();
         } catch (Exception e) {
@@ -103,10 +124,21 @@ public class MainViewController {
             e.printStackTrace();
             System.exit(0);
         }
-        setUpLists();
-        setUpErrors();
-        updateContactList();
-        setUpReadings();
+    }
+
+    private void setUpLists() {
+        chatList = FXCollections.observableArrayList();
+        chatListView.setItems(chatList);
+
+        contactsList = FXCollections.observableArrayList();
+        contactsListView.setItems(contactsList);
+        contactsAdded = new HashSet<>();
+    }
+
+    private void setUpErrors() {
+        onlineStatusErrorText.setOpacity(0);
+        chatViewErrorText.setOpacity(0);
+        contactListErrorText.setOpacity(0);
     }
 
     public static void logMessage(String message) {
@@ -117,30 +149,35 @@ public class MainViewController {
         List<String> contactsToAdd = networkHandler.getNeighborhood();
 
         for (String userID : contactsToAdd) {
-            addContact(userID);
+            addContactToListView(userID);
         }
     }
 
-    public static void addContact(String contactNick) {
+    private void setUpReadings() {
+        setNewRadiusText(clientData.detectionRadius);
+        setNewCoordinateText(latitudeText, "Latitude", clientData.initialLatitude);
+        setNewCoordinateText(longitudeText, "Longitude", clientData.initialLongitude);
+        setOnlineStatusText(clientData.initialOnlineStatus);
+        isOnlineCheckBox.setSelected(clientData.initialOnlineStatus);
+    }
+
+    public static void addContactToListView(String contactNick) {
         ClientDataSingleton clientData = ClientDataSingleton.getInstance();
         if (contactsAdded.contains(contactNick) || contactNick.equals(clientData.userNick)) return;
 
-        try {
-            System.out.println("Pinging user " + contactNick);
-            NetworkHandlerSingleton.getInstance().pingUser(contactNick);
-        } catch (AcquireTupleException e) {
-            System.out.println("Couldn't ping user " + contactNick + "!");
-            e.printStackTrace();
-        }
+        notifyContactInRange(contactNick);
 
         contactsAdded.add(contactNick);
         String contactName = NetworkHandlerSingleton.getInstance().getUserName(contactNick);
+        ContactEntryHBox hBox = setUpHBox(contactNick, contactName);
+        contactsList.add(hBox);
+    }
 
+    private static ContactEntryHBox setUpHBox(String contactNick, String contactName) {
         Text text = new Text(contactName + " (" + contactNick + ")");
         Region spacer = new Region();
         CheckBox checkBox = new CheckBox("Send message?");
         Button deleteButton = new Button("Excluir");
-
         deleteButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
@@ -155,38 +192,30 @@ public class MainViewController {
         ContactEntryHBox hBox = new ContactEntryHBox(contactNick, contactName, checkBox);
         hBox.getChildren().addAll(text, spacer, checkBox, deleteButton);
         hBox.setHgrow(spacer, Priority.ALWAYS);
-
-        contactsList.add(hBox);
+        return hBox;
     }
 
-    private void setUpLists() {
-        chatList = FXCollections.observableArrayList();
-        chatListView.setItems(chatList);
-
-        contactsList = FXCollections.observableArrayList();
-        contactsListView.setItems(contactsList);
-        contactsAdded = new HashSet<>();
-    }
-
-    private void setUpErrors() {
-        contactRadiusErrorText.setOpacity(0);
-        chatViewErrorText.setOpacity(0);
-        contactListErrorText.setOpacity(0);
-    }
-
-    private void setUpReadings() {
-        setNewRadiusText(clientData.detectionRadius);
-        setNewLatitudeText(clientData.initialLatitude);
-        setNewLongitudeText(clientData.initialLongitude);
-        setOnlineStatusText(clientData.initialOnlineStatus);
-        isOnlineCheckBox.setSelected(clientData.initialOnlineStatus);
+    private static void notifyContactInRange(String contactNick) {
+        try {
+            System.out.println("Pinging user " + contactNick);
+            NetworkHandlerSingleton.getInstance().pingUser(contactNick);
+        } catch (AcquireTupleException e) {
+            System.out.println("Couldn't ping user " + contactNick + "!");
+            e.printStackTrace();
+        }
     }
 
     @FXML
     void onRadiusAction() {
-        Integer radius = getValueFromField(contactRadiusField);
-        if (radius == null || radius < 0) {
-            showErrorOnField(contactRadiusField);
+        int radius = -1;
+        try {
+            radius = getValueFromField(contactRadiusField);
+        } catch (NumberFormatException e) {
+            showMessageTemporarilyOnField(contactRadiusField, "Valor inválido!");
+            return;
+        }
+        if (radius < 0) {
+            showMessageTemporarilyOnField(contactRadiusField, "Valor inválido!");
             return;
         }
         clientData.detectionRadius = radius;
@@ -198,43 +227,58 @@ public class MainViewController {
 
     @FXML
     void onLatitudeFieldAction() {
-        Integer latitude = getValueFromField(latitudeField);
-        if (latitude == null) {
-            showErrorOnField(latitudeField);
-            return;
-        }
-        if (!updateMyUser(null, latitude, null)) return;
-        updateContactList();
-        setNewLatitudeText(latitude);
-        latitudeField.clear();
+        updatePositionFromField(latitudeField);
     }
 
     @FXML
     void onLongitudeFieldAction() {
-        Integer longitude = getValueFromField(longitudeField);
-        if (longitude == null) {
-            showErrorOnField(longitudeField);
+        updatePositionFromField(longitudeField);
+    }
+
+    private void updatePositionFromField(TextField field) {
+        Integer coordinate = getCoordinateOrNull(field);
+        if (coordinate == null) return;
+        try {
+            updateMyUser(coordinate, null, null);
+        } catch (WriteTupleException e) {
+            showMessageTemporarilyOnField(field, "Falha na escrita!");
+            e.printStackTrace();
             return;
         }
-        if (!updateMyUser(longitude, null, null)) return;
         updateContactList();
-        setNewLongitudeText(longitude);
-        longitudeField.clear();
+        setCoordinateReadingText(field, coordinate);
+        field.clear();
     }
 
-    Integer getValueFromField(TextField field) {
-        int value = -1;
+    private void setCoordinateReadingText(TextField field, Integer coordinate) {
+        if (field == longitudeField) {
+            setNewCoordinateText(longitudeText, "Longitude", coordinate);
+        } else {
+            setNewCoordinateText(latitudeText, "Latitude", coordinate);
+        }
+    }
+
+    private Integer getCoordinateOrNull(TextField field) {
+        int coordinate = -1;
         try {
-            value = Integer.parseInt(field.getText());
-        } catch (NumberFormatException ex) {
-            showErrorOnField(field);
+            coordinate = getValueFromField(field);
+        } catch (NumberFormatException e) {
+            showMessageTemporarilyOnField(field, "Valor inválido!");
             return null;
         }
-        return value;
+        return coordinate;
     }
 
-    void showErrorOnField(TextField field) {
-        field.setText("Valor inválido!");
+    int getValueFromField(TextField field) {
+        return Integer.parseInt(field.getText());
+    }
+
+    void showMessageTemporarilyOnField(TextField field, String message) {
+        field.setText(message);
+        showTemporaryError(field);
+    }
+
+    private void showTemporaryError(TextField field) {
         field.setDisable(true);
         Timer refreshTimer = new Timer(1000, new ActionListener() {
             @Override
@@ -250,33 +294,43 @@ public class MainViewController {
     @FXML
     void onOnlineStatusChanged() {
         boolean isOnline = isOnlineCheckBox.isSelected();
-        if (!updateMyUser(null, null, isOnline)) return;
+        try {
+            updateMyUser(null, null, isOnline);
+        } catch (WriteTupleException e) {
+            showErrorOnOnlineStatusText();
+        }
         updateContactList();
         setOnlineStatusText(isOnline);
     }
 
-    private boolean updateMyUser(Integer longitude, Integer latitude, Boolean isOnline) {
+    private void showErrorOnOnlineStatusText() {
+        onlineStatusErrorText.setText("Falha na escrita!");
+        onlineStatusErrorText.setOpacity(1);
+        Timer refreshTimer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                onlineStatusErrorText.setOpacity(0);
+            }
+        });
+        refreshTimer.setRepeats(false);
+        refreshTimer.start();
+    }
+
+    void updateMyUser(Integer longitude, Integer latitude, Boolean isOnline) throws WriteTupleException {
         try {
             networkHandler.updateMyUser(latitude, longitude, isOnline);
             getQueuedMessagesIfOnline(isOnlineCheckBox.isSelected());
         } catch (Exception e) {
-            // TODO: Add UI error messages
-            e.printStackTrace();
-            return false;
+            throw new WriteTupleException();
         }
-        return true;
+    }
+
+    private void setNewCoordinateText(Text text, String coordinateName, int coordinate) {
+        text.setText(coordinateName + " (atual: " + coordinate + ")");
     }
 
     private void setNewRadiusText(int newRadius) {
         radiusText.setText("Raio (atual: " + newRadius + ")");
-    }
-
-    private void setNewLatitudeText(int newLatitude) {
-        latitudeText.setText("Latitude (atual: " + newLatitude + ")");
-    }
-
-    private void setNewLongitudeText(int newLongitude) {
-        longitudeText.setText("Longitude (atual: " + newLongitude + ")");
     }
 
     private void setOnlineStatusText(boolean isOnline) {

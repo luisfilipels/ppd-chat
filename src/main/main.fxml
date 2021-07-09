@@ -55,7 +55,7 @@
                         <Font size="13.0" />
                      </font>
                   </Text>
-                  <Text fx:id="contactRadiusErrorText" fill="#fdff52" layoutX="161.0" layoutY="318.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Este campo nao pode estar vazio!" />
+                  <Text fx:id="onlineStatusErrorText" fill="#fdff52" layoutX="101.0" layoutY="424.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Este campo nao pode estar vazio!" />
                   <Text fx:id="contactListErrorText" fill="#fdff52" layoutX="17.0" layoutY="62.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Problema atualizando a lista!" />
                   <TextField fx:id="latitudeField" layoutX="17.0" layoutY="373.0" onAction="#onLatitudeFieldAction" />
                   <TextField fx:id="longitudeField" layoutX="212.0" layoutY="373.0" onAction="#onLongitudeFieldAction" />

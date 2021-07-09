@@ -36,7 +36,7 @@ public class Receiver implements Runnable{
             @Override
             public void run() {
                 if (NetworkHandlerSingleton.getInstance().userIsInRange(from)) {
-                    MainViewController.addContact(from);
+                    MainViewController.addContactToListView(from);
                 }
             }
         });
